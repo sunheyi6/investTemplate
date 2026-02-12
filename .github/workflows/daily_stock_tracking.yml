@@ -1,0 +1,72 @@
+name: 每日港股标的追踪
+
+on:
+  schedule:
+    # 香港时间 16:30（收盘后）= UTC 08:30
+    - cron: '30 8 * * 1-5'
+  
+  # 允许手动触发
+  workflow_dispatch:
+
+jobs:
+  track-stocks:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v3
+      
+    - name: 设置 Python 环境
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        
+    - name: 安装依赖
+      run: |
+        python -m pip install --upgrade pip
+        pip install yfinance pandas matplotlib
+        
+    - name: 运行追踪脚本
+      run: |
+        cd 07-标的追踪
+        python auto_stock_tracker.py
+        
+    - name: 提交追踪数据
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add 07-标的追踪/stock_data/
+        git commit -m "📊 更新每日追踪数据 $(date +'%Y-%m-%d')" || echo "No changes to commit"
+        git push
+        
+    - name: 上传报告为Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: daily-report-${{ github.run_date }}
+        path: 07-标的追踪/stock_data/daily_report.md
+        
+    - name: 创建Issue提醒（如有可买标的）
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const reportPath = '07-标的追踪/stock_data/daily_report.md';
+          
+          if (fs.existsSync(reportPath)) {
+            const report = fs.readFileSync(reportPath, 'utf8');
+            
+            // 检查是否有买入提醒
+            if (report.includes('🔴 **可买**')) {
+              // 提取可买标的
+              const buySection = report.split('## 🔔 买入提醒')[1];
+              const title = `🚨 买入提醒 - ${new Date().toISOString().split('T')[0]}`;
+              
+              github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: report,
+                labels: ['buy-signal', 'automated']
+              });
+            }
+          }
