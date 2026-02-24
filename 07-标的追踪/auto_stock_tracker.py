@@ -16,33 +16,44 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from pathlib import Path
 
-# 标的配置
+# 标的配置 - 合并推荐清单 + 十九菜持仓
 STOCKS = {
+    # ========== 十九菜持仓（优先追踪）==========
+    '1448.HK': {'name': '福寿园', 'target_drop': 15, 'category': '十九菜持仓-垄断', 'base_price': None, 'strategy': '长期持有'},
+    '2669.HK': {'name': '中海物业', 'target_drop': 15, 'category': '十九菜持仓-物管', 'base_price': None, 'strategy': '估值修复'},
+    '6862.HK': {'name': '海底捞', 'target_drop': 20, 'category': '十九菜持仓-困境反转', 'base_price': None, 'strategy': '困境反转'},
+    '1113.HK': {'name': '长实集团', 'target_drop': 15, 'category': '十九菜持仓-烟蒂股', 'base_price': None, 'strategy': '烟蒂股'},
+    '0001.HK': {'name': '长和', 'target_drop': 15, 'category': '十九菜持仓-控股平台', 'base_price': None, 'strategy': '控股套利'},
+    '0696.HK': {'name': '中国民航信息网络', 'target_drop': 15, 'category': '十九菜持仓-垄断', 'base_price': None, 'strategy': '长期持有'},
+    '3320.HK': {'name': '华润医药', 'target_drop': 15, 'category': '十九菜持仓-控股平台', 'base_price': None, 'strategy': '控股套利'},
+    '2319.HK': {'name': '蒙牛乳业', 'target_drop': 20, 'category': '十九菜持仓-困境反转', 'base_price': None, 'strategy': '困境反转'},
+    '3613.HK': {'name': '同仁堂国药', 'target_drop': 15, 'category': '十九菜持仓-品牌', 'base_price': None, 'strategy': 'FCEV低估'},
+    '0882.HK': {'name': '天津发展', 'target_drop': 10, 'category': '十九菜持仓-烟蒂股', 'base_price': None, 'strategy': '烟蒂股'},
+    
+    # ========== 推荐清单（备选）==========
     # 内银股
-    '1398.HK': {'name': '工商银行', 'target_drop': 10, 'category': '内银股', 'base_price': None},
-    '3988.HK': {'name': '中国银行', 'target_drop': 10, 'category': '内银股', 'base_price': None},
-    '0939.HK': {'name': '建设银行', 'target_drop': 10, 'category': '内银股', 'base_price': None},
-    '1288.HK': {'name': '农业银行', 'target_drop': 10, 'category': '内银股', 'base_price': None},
+    '1398.HK': {'name': '工商银行', 'target_drop': 10, 'category': '内银股', 'base_price': None, 'strategy': '高股息'},
+    '3988.HK': {'name': '中国银行', 'target_drop': 10, 'category': '内银股', 'base_price': None, 'strategy': '高股息'},
+    '0939.HK': {'name': '建设银行', 'target_drop': 10, 'category': '内银股', 'base_price': None, 'strategy': '高股息'},
+    '1288.HK': {'name': '农业银行', 'target_drop': 10, 'category': '内银股', 'base_price': None, 'strategy': '高股息'},
     
     # 能源股
-    '1088.HK': {'name': '中国神华', 'target_drop': 15, 'category': '能源股', 'base_price': None},
-    '1898.HK': {'name': '中煤能源', 'target_drop': 15, 'category': '能源股', 'base_price': None},
-    '0386.HK': {'name': '中国石油', 'target_drop': 15, 'category': '能源股', 'base_price': None},
-    '0857.HK': {'name': '中国石油股份', 'target_drop': 15, 'category': '能源股', 'base_price': None},
+    '1088.HK': {'name': '中国神华', 'target_drop': 15, 'category': '能源股', 'base_price': None, 'strategy': '高股息'},
+    '1898.HK': {'name': '中煤能源', 'target_drop': 15, 'category': '能源股', 'base_price': None, 'strategy': '高股息'},
+    '0386.HK': {'name': '中国石油', 'target_drop': 15, 'category': '能源股', 'base_price': None, 'strategy': '高股息'},
+    '0857.HK': {'name': '中国石油股份', 'target_drop': 15, 'category': '能源股', 'base_price': None, 'strategy': '高股息'},
     
     # 公用事业
-    '0836.HK': {'name': '华润电力', 'target_drop': 15, 'category': '公用事业', 'base_price': None},
-    '0902.HK': {'name': '华能国际', 'target_drop': 15, 'category': '公用事业', 'base_price': None},
-    '2380.HK': {'name': '中国电力', 'target_drop': 15, 'category': '公用事业', 'base_price': None},
+    '0836.HK': {'name': '华润电力', 'target_drop': 15, 'category': '公用事业', 'base_price': None, 'strategy': '防御性'},
+    '0902.HK': {'name': '华能国际', 'target_drop': 15, 'category': '公用事业', 'base_price': None, 'strategy': '防御性'},
+    '2380.HK': {'name': '中国电力', 'target_drop': 15, 'category': '公用事业', 'base_price': None, 'strategy': '防御性'},
     
     # 基建/地产
-    '3311.HK': {'name': '中国建筑国际', 'target_drop': 15, 'category': '基建', 'base_price': None},
-    '0960.HK': {'name': '龙湖集团', 'target_drop': 20, 'category': '地产', 'base_price': None},
+    '3311.HK': {'name': '中国建筑国际', 'target_drop': 15, 'category': '基建', 'base_price': None, 'strategy': '估值修复'},
+    '0960.HK': {'name': '龙湖集团', 'target_drop': 20, 'category': '地产', 'base_price': None, 'strategy': '困境反转'},
     
-    # 烟蒂股
-    '0882.HK': {'name': '天津发展', 'target_drop': 5, 'category': '烟蒂股', 'base_price': None},
-    '3320.HK': {'name': '华润医药', 'target_drop': 10, 'category': '烟蒂股', 'base_price': None},
-    '0363.HK': {'name': '同仁堂国药', 'target_drop': 15, 'category': '烟蒂股', 'base_price': None},
+    # REITs/汇率对冲
+    '87001.HK': {'name': '汇贤产业信托', 'target_drop': 15, 'category': 'REITs-汇率对冲', 'base_price': None, 'strategy': '人民币升值受益'},
 }
 
 class AutoStockTracker:
