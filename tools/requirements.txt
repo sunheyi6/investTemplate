@@ -1,0 +1,14 @@
+# 投资模板工具依赖 (V5.3.2)
+
+# 数据抓取
+akshare>=1.15.0      # 东方财富数据源（国内稳定）
+yfinance>=0.2.0      # Yahoo Finance（港股美股）
+pandas>=2.0.0        # 数据处理
+requests>=2.31.0     # HTTP请求
+
+# 风控配置
+pyyaml>=6.0          # YAML配置解析
+
+# 可选（负债分析增强）
+openpyxl>=3.1.0      # Excel财报解析
+PyPDF2>=3.0.0        # PDF财报解析
