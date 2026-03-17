@@ -1,0 +1,45 @@
+/* 自定义样式 */
+
+/* 优化中文排版 */
+.vp-doc p {
+  text-align: justify;
+  line-height: 1.8;
+}
+
+/* 表格样式优化 */
+.vp-doc table {
+  font-size: 14px;
+}
+
+/* 代码块字体 */
+.vp-doc div[class*='language-'] {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+}
+
+/* 自定义提示框颜色 */
+.custom-block.tip {
+  border-color: var(--vp-c-brand);
+}
+
+.custom-block.warning {
+  border-color: #e7c000;
+}
+
+.custom-block.danger {
+  border-color: #c00;
+}
+
+/* 首页 Hero 区域 */
+.VPHero .name {
+  font-size: 48px;
+}
+
+.VPHero .tagline {
+  font-size: 20px;
+  color: var(--vp-c-text-2);
+}
+
+/* 侧边栏分组标题 */
+.VPSidebarGroup .title {
+  font-weight: 600;
+}

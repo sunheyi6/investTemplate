@@ -1,1 +1,43 @@
-.alma-snapshots
+# VitePress
+.vitepress/dist
+.vitepress/cache
+node_modules
+
+# 依赖
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 日志
+*.log
+npm-debug.log*
+
+# 本地环境
+.env
+.env.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# 生成的数据文件
+*.csv
+*.xlsx
+
+# 临时文件
+tmp/
+temp/

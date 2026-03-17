@@ -1,0 +1,13 @@
+{
+  "name": "invest-template-docs",
+  "version": "5.5.7",
+  "description": "港股/A股个股投资分析模板文档",
+  "scripts": {
+    "docs:dev": "vitepress dev",
+    "docs:build": "vitepress build",
+    "docs:preview": "vitepress preview"
+  },
+  "devDependencies": {
+    "vitepress": "^1.0.0"
+  }
+}
