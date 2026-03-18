@@ -4,7 +4,7 @@ layout: home
 hero:
   name: 投资分析模板
   text: 系统化价值投资框架
-  tagline: 港股/A股个股研究的标准化方法论 · V5.5.7 熊市阈值+消除变量版
+  tagline: 港股/A股个股研究的标准化方法论 · V5.5.8 龟龟投资理论+风险记忆+汇贤案例版
   image:
     src: /logo.svg
     alt: 投资分析模板
@@ -18,6 +18,9 @@ hero:
     - theme: alt
       text: 📊 估值模型
       link: /03-估值模型/03-V2-高股息协议
+    - theme: alt
+      text: 📈 分析报告
+      link: /07-分析输出/
 
 features:
   - icon: 🎯
@@ -25,7 +28,7 @@ features:
     details: 纯硬收息 / 价值发现 / 烟蒂股 / 关联方资源型，系统化的投资分类方法论
   - icon: 📋
     title: 标准化分析模板
-    details: V5.5.7 版本，覆盖筛选→清洗→估值→决策全流程，消除变量行业筛选
+    details: V5.5.8 版本，覆盖筛选→清洗→估值→决策全流程，汇贤产业信托实战案例，消除变量行业筛选
   - icon: 🤖
     title: AI 辅助分析
     details: 标签化任务分工 [COMPUTABLE][LLM-REQUIRED][MANUAL-ONLY]，人机协作提效
@@ -64,6 +67,7 @@ npm run docs:build
 | [04-决策分析](/04-决策分析/) | 买卖决策框架 |
 | [05-策略框架](/05-策略框架/) | 烟蒂股等特定策略 |
 | [06-附录案例](/06-附录案例/) | 实战案例库 |
+| [07-分析输出](/07-分析输出/) | 📈 个股投资分析报告归档 |
 
 ## 核心概念
 
@@ -74,5 +78,5 @@ npm run docs:build
 ---
 
 <p align="center">
-  <small>当前版本: V5.5.7 | 最后更新: 2026-03-15</small>
+  <small>当前版本: V5.5.8 | 最后更新: 2026-03-18</small>
 </p>

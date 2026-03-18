@@ -2,7 +2,7 @@ import { defineConfig } from 'vitepress'
 
 export default defineConfig({
   title: '投资分析模板',
-  description: '港股/A股个股投资分析框架 V5.5.7',
+  description: '港股/A股个股投资分析框架 V5.5.8',
   lang: 'zh-CN',
   
   // 忽略的死链（有些文件可能临时不存在）
@@ -83,7 +83,9 @@ export default defineConfig({
           { text: '保利物业_06049_投资分析报告', link: '/07-分析输出/保利物业_06049_投资分析报告' },
           { text: '天津发展_00882_投资分析报告', link: '/07-分析输出/天津发展_00882_投资分析报告' },
           { text: '中国民航信息网络_00696_投资分析报告', link: '/07-分析输出/中国民航信息网络_00696_投资分析报告' },
-          { text: '金融街物业_01502_投资分析报告', link: '/07-分析输出/金融街物业_01502_投资分析报告' }
+          { text: '金融街物业_01502_投资分析报告', link: '/07-分析输出/金融街物业_01502_投资分析报告' },
+          { text: '中海物业_02669_投资分析报告', link: '/07-分析输出/中海物业_02669_投资分析报告' },
+          { text: '汇贤产业信托_87001_投资分析报告', link: '/07-分析输出/汇贤产业信托_87001_投资分析报告' }
         ]
       },
       {
@@ -125,7 +127,7 @@ export default defineConfig({
     // 页脚
     footer: {
       message: '基于 Apache License 2.0 开源协议',
-      copyright: 'Copyright © 2026 投资分析模板 V5.5.7'
+      copyright: 'Copyright © 2026 投资分析模板 V5.5.8'
     },
     
     // 大纲显示级别
