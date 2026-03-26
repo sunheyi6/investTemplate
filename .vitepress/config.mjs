@@ -2,7 +2,7 @@ import { defineConfig } from 'vitepress'
 
 export default defineConfig({
   title: '投资分析模板',
-  description: '港股/A股个股投资分析框架 V5.5.11',
+  description: '港股/A股个股投资分析框架 V5.5.12'
   lang: 'zh-CN',
   
   // 忽略的死链（有些文件可能临时不存在）
@@ -94,7 +94,8 @@ export default defineConfig({
           { text: '同仁堂国药_03613_投资分析报告', link: '/07-分析输出/同仁堂国药_03613_投资分析报告' },
           { text: '牧原股份_002714_投资分析报告', link: '/07-分析输出/牧原股份_002714_投资分析报告' },
           { text: '分众传媒_002027_投资分析报告', link: '/07-分析输出/分众传媒_002027_投资分析报告' },
-          { text: '青岛啤酒_600600_投资分析报告', link: '/07-分析输出/青岛啤酒_600600_投资分析报告' }
+          { text: '青岛啤酒_600600_投资分析报告', link: '/07-分析输出/青岛啤酒_600600_投资分析报告' },
+          { text: '华润医药_03320_投资分析报告', link: '/07-分析输出/华润医药_03320_投资分析报告' }
         ]
       },
       {
@@ -136,7 +137,7 @@ export default defineConfig({
     // 页脚
     footer: {
       message: '基于 Apache License 2.0 开源协议',
-      copyright: 'Copyright © 2026 投资分析模板 V5.5.11'
+      copyright: 'Copyright © 2026 投资分析模板 V5.5.12'
     },
     
     // 大纲显示级别
