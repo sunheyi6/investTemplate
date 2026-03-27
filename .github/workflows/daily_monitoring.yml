@@ -45,7 +45,7 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         # 使用目录级 add，避免单文件缺失导致 pathspec 报错
-        git add -A "07-分析输出/监控概览.md" "08-决策追踪/"
+        git add -A "07-分析输出/监控概览.md" "08-决策追踪/" "public/dashboard/"
         git commit -m "📊 更新每日监控概览 $(date +'%Y-%m-%d %H:%M')" || echo "No changes to commit"
         git push
         

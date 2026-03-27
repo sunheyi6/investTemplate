@@ -6,7 +6,7 @@
 1. 拉取模拟组合标的最新收盘价（yfinance）
 2. 按规则执行自动决策（卖出触发 / 回撤加仓）
 3. 更新持仓状态、现金余额、组合净值、收益率
-4. 生成统一仪表盘快照（08-决策追踪/dashboard_snapshot.json）
+4. 生成统一仪表盘快照（public/dashboard/dashboard_snapshot.json）
 """
 
 from __future__ import annotations
@@ -23,10 +23,12 @@ import yfinance as yf
 
 ROOT = Path(__file__).resolve().parents[1]
 TRACK_DIR = ROOT / "08-决策追踪"
+PUBLIC_DIR = ROOT / "public" / "dashboard"
 STATE_FILE = TRACK_DIR / "simulation_state.json"
 TRADES_FILE = TRACK_DIR / "simulation_trades.csv"
 DAILY_FILE = TRACK_DIR / "simulation_daily_snapshot.csv"
 SNAPSHOT_FILE = TRACK_DIR / "dashboard_snapshot.json"
+PUBLIC_SNAPSHOT_FILE = PUBLIC_DIR / "dashboard_snapshot.json"
 AI_RECORD_FILE = TRACK_DIR / "AI决策记录.md"
 
 INITIAL_CAPITAL = 500000.0
@@ -125,6 +127,7 @@ def normalize_state_positions(positions: Dict[str, Dict]) -> Tuple[Dict[str, Dic
 def ensure_state() -> Dict:
     """初始化状态文件。"""
     TRACK_DIR.mkdir(parents=True, exist_ok=True)
+    PUBLIC_DIR.mkdir(parents=True, exist_ok=True)
     if STATE_FILE.exists():
         state = json.loads(STATE_FILE.read_text(encoding="utf-8"))
         positions, changed = normalize_state_positions(state.get("positions", {}))
@@ -451,10 +454,9 @@ def build_dashboard_snapshot(price_map: Dict[str, PricePoint] | None = None) -> 
         "recent_actions": recent_ops,
         "ai_decisions": ai_summary,
     }
-    SNAPSHOT_FILE.write_text(
-        json.dumps(snapshot, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
+    snapshot_text = json.dumps(snapshot, ensure_ascii=False, indent=2)
+    SNAPSHOT_FILE.write_text(snapshot_text, encoding="utf-8")
+    PUBLIC_SNAPSHOT_FILE.write_text(snapshot_text, encoding="utf-8")
     return snapshot
 
 

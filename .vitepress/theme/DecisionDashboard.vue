@@ -99,11 +99,21 @@ async function loadData() {
   loading.value = true
   error.value = ''
   try {
-    const res = await fetch(withBase('/08-决策追踪/dashboard_snapshot.json'), {
-      cache: 'no-store'
-    })
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    data.value = await res.json()
+    const candidates = [
+      withBase('/dashboard/dashboard_snapshot.json'),
+      withBase('/08-决策追踪/dashboard_snapshot.json')
+    ]
+    let lastStatus = '404'
+    for (const url of candidates) {
+      const res = await fetch(url, { cache: 'no-store' })
+      if (res.ok) {
+        data.value = await res.json()
+        loading.value = false
+        return
+      }
+      lastStatus = String(res.status)
+    }
+    throw new Error(`HTTP ${lastStatus}`)
   } catch (e) {
     error.value = `加载失败：${e instanceof Error ? e.message : '未知错误'}`
   } finally {
