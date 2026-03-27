@@ -44,11 +44,8 @@ jobs:
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add 07-分析输出/监控概览.md
-        git add 08-决策追踪/每日股价监控.md
-        git add 08-决策追踪/simulation_state.json
-        git add 08-决策追踪/simulation_trades.csv
-        git add 08-决策追踪/simulation_daily_snapshot.csv
+        # 使用目录级 add，避免单文件缺失导致 pathspec 报错
+        git add -A "07-分析输出/监控概览.md" "08-决策追踪/"
         git commit -m "📊 更新每日监控概览 $(date +'%Y-%m-%d %H:%M')" || echo "No changes to commit"
         git push
         
