@@ -2,8 +2,8 @@
   "template_version": "V5.5.12",
   "engine_version": "V1.0",
   "initial_capital": 500000.0,
-  "cash": 52500.0,
-  "last_trade_date": "2026-03-26",
+  "cash": 36405.0,
+  "last_trade_date": "2026-03-27",
   "positions": {
     "01522.HK": {
       "name": "京投交通科技",
@@ -24,13 +24,13 @@
       "code": "87001",
       "ticker": "87001.HK",
       "lot_size": 1000,
-      "shares": 250000,
-      "avg_cost": 0.5,
+      "shares": 287000,
+      "avg_cost": 0.49162020936660233,
       "initial_investment": 125000.0,
       "sell_trigger": 1.0,
       "max_weight": 0.25,
       "position_type": "核心",
-      "added_cost_total": 0.0,
+      "added_cost_total": 16095.000088214874,
       "realized_pnl": 0.0
     },
     "00882.HK": {
