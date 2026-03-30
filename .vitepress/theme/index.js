@@ -1,9 +1,10 @@
 import DefaultTheme from 'vitepress/theme'
 import './custom.css'
+import DecisionDashboard from './DecisionDashboard.vue'
 
 export default {
   extends: DefaultTheme,
-  enhanceApp({ app, router, siteData }) {
-    // 可以在这里添加自定义组件或逻辑
+  enhanceApp({ app }) {
+    app.component('DecisionDashboard', DecisionDashboard)
   }
 }

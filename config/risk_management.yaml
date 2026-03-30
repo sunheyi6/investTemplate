@@ -1,8 +1,8 @@
-# 风控规则配置（V5.5.10）
+# 风控规则配置（V5.5.13）
 # 个股投资风险管理规则
 
-version: "5.5.10"
-last_updated: "2026-03-22"
+version: "5.5.13"
+last_updated: "2026-03-29"
 
 # ==================== 仓位限制 ====================
 position_limits:
@@ -86,6 +86,53 @@ market_risk:
     恒指跌幅>20%: "暂停买入，评估持仓"
     恒指跌幅>30%: "启用备用资金，逐步加仓"
     个股跌幅>50%: "深度复盘，确认是否止损"
+  
+  # 主锚：港股本地情绪监控（V5.5.13新增）
+  vhsi_monitoring:
+    数据源: "港交所 VHSI (^VHSI)"
+    更新频率: "每日收盘后"
+    
+    levels:
+      平静期:
+        vhsi_max: 22
+        action: "正常执行选股标准"
+        cash_reserve_min: 0.10
+        
+      谨慎期:
+        vhsi_range: [22, 27]
+        action: "收紧买入标准，只买核心仓位标的"
+        cash_reserve_min: 0.15
+        position_adjustment: "卫星仓位减半"
+        
+      恐慌期:
+        vhsi_range: [27, 32]
+        action: "暂停新建仓，仅加仓🟢低风险标的"
+        cash_reserve_min: 0.20
+        position_adjustment: "较高风险标的减仓50%"
+        valuation_filter: "仅净现金>市值40% 或 FCF<2.5倍"
+        
+      高度恐慌期:
+        vhsi_range: [32, 40]
+        action: "全面评估持仓，高风险标的强制清仓"
+        cash_reserve_min: 0.25
+        position_adjustment: "中风险及以上标的减仓20-50%"
+        
+      极端恐慌期:
+        vhsi_min: 40
+        action: "逐步加仓成长股（仅限卫星仓位3-5%），执行防御→成长切换"
+        cash_reserve_min: 0.15
+        position_adjustment: "仅保留🟢低风险标的+现金，其余切换"
+        switch_target: "跌幅>60%的科技龙头、10倍PE以下成长股"
+
+  # 辅锚：美股恐慌指数（全球系统性风险参考）
+  vix_monitoring:
+    数据源: "CBOE (^VIX)"
+    更新频率: "每日收盘后"
+    作用: "辅助判断是否为全球性恐慌"
+    联动规则:
+      vhsi高+vix高: "全球同步恐慌，保守应对"
+      vhsi高+vix低: "港股独立恐慌，可能存在独立抄底机会"
+      vhsi低+vix高: "美股独慌，港股观望"
 
 # ==================== 标的质量红线 ====================
 quality_red_lines:

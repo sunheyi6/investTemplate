@@ -12,19 +12,32 @@ export default defineConfig({
     // 导航栏
     nav: [
       { text: '首页', link: '/' },
-      { text: '🎯 模拟持仓', link: '/模拟持仓' },
+      { text: '🎯 模拟持仓', link: '/模拟持仓/持仓' },
       { text: '分析模板', link: '/个股分析标准模版' },
       { text: '版本日志', link: '/CHANGELOG' }
     ],
     
     // 侧边栏
-    sidebar: [
+    sidebar: {
+      '/模拟持仓/': [
+        {
+          text: '🎯 模拟持仓',
+          collapsed: false,
+          items: [
+            { text: '总览', link: '/模拟持仓/' },
+            { text: '持仓', link: '/模拟持仓/持仓' },
+            { text: '今日操作', link: '/模拟持仓/今日操作' },
+            { text: '决策记录', link: '/模拟持仓/决策记录' }
+          ]
+        }
+      ],
+      '/': [
       {
         text: '📋 核心文档',
         collapsed: false,
         items: [
           { text: '个股分析标准模版', link: '/个股分析标准模版' },
-          { text: '🎯 模拟持仓（实时）', link: '/模拟持仓' },
+          { text: '🎯 模拟持仓（实时）', link: '/模拟持仓/持仓' },
           { text: '项目介绍', link: '/README' },
           { text: '项目结构说明', link: '/项目结构说明' },
           { text: '更新日志', link: '/CHANGELOG' }
@@ -113,12 +126,11 @@ export default defineConfig({
         text: '🤖 08-决策追踪',
         collapsed: true,
         items: [
-          { text: 'AI决策记录', link: '/08-决策追踪/AI决策记录' },
-          { text: '模拟投资组合（50万港币）', link: '/08-决策追踪/模拟投资组合_50万港币' },
-          { text: '每日股价监控', link: '/08-决策追踪/每日股价监控' }
+          { text: '🎯 模拟持仓', link: '/模拟持仓/持仓' }
         ]
       }
-    ],
+      ]
+    },
     
     // 社交链接
     socialLinks: [
