@@ -1,0 +1,41 @@
+{
+  "template_version": "V5.5.12",
+  "engine_version": "V3.0",
+  "initial_capital": 500000.0,
+  "cash": 108410.0,
+  "last_trade_date": "2026-03-26",
+  "positions": {
+    "1522.HK": {
+      "name": "京投交通科技",
+      "ticker": "1522.HK",
+      "code": "",
+      "shares": 342000,
+      "avg_cost": 0.295,
+      "realized_pnl": 0.0
+    },
+    "87001.HK": {
+      "name": "汇贤产业信托",
+      "ticker": "87001.HK",
+      "code": "",
+      "shares": 250000,
+      "avg_cost": 0.435,
+      "realized_pnl": 0.0
+    },
+    "0882.HK": {
+      "name": "天津发展",
+      "ticker": "0882.HK",
+      "code": "",
+      "shares": 40000,
+      "avg_cost": 2.55,
+      "realized_pnl": 0.0
+    },
+    "3320.HK": {
+      "name": "华润医药",
+      "ticker": "3320.HK",
+      "code": "",
+      "shares": 15000,
+      "avg_cost": 5.33,
+      "realized_pnl": 0.0
+    }
+  }
+}
