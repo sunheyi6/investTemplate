@@ -1,23 +1,32 @@
 # -*- coding: utf-8 -*-
 """
-VIX-纳斯达克100定投回测脚本 V2.0
-基于恐慌指数(VIX)的动态加仓定投策略回测
+VIX-纳斯达克100定投回测脚本 V3.0（同总投入口径）
+基于投资模板 V5.5.13 标准自动回测
 
-核心改进：相同总资金池对比
-- VIX策略：恐慌时多投，把现金都投入股市
-- 普通定投：只投基础金额，剩余现金买理财（3%年化）
-- 对比维度：最终总资产（股市+现金）
+核心口径：
+1) 普通固定定投：每月固定投入（默认 1000 USD）
+2) 精细6档 VIX 等额定投：按VIX档位动态调整月投入，但总投入与普通定投严格相同
+3) 一次性满仓：在首个定投日一次性投入同等总资金
+
+输出维度：总投入、期末资产、总收益率、复合年化(IRR)、最大回撤
 """
 
 import warnings
 warnings.filterwarnings('ignore')
 
-import yfinance as yf
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 from pathlib import Path
 from datetime import datetime
+
+import numpy as np
+import pandas as pd
+import yfinance as yf
+
+try:
+    import matplotlib.pyplot as plt
+    HAS_MPL = True
+except Exception:
+    HAS_MPL = False
+
 
 # 路径配置
 ROOT = Path(__file__).resolve().parents[1]
@@ -25,674 +34,381 @@ OUTPUT_DIR = ROOT / "05-策略框架" / "VIX-纳斯达克100定投策略"
 CHARTS_DIR = OUTPUT_DIR / "charts"
 REPORT_FILE = OUTPUT_DIR / "backtest_report.md"
 
-# 确保目录存在
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 CHARTS_DIR.mkdir(parents=True, exist_ok=True)
 
-# 回测配置
+
 BACKTEST_CONFIG = {
     'start_date': '2015-01-01',
-    'base_monthly_investment': 1000,   # USD
+    'symbol': 'QQQ',
+    'vix_symbol': '^VIX',
     'investment_day': 1,               # 每月第1个交易日
+    'fixed_monthly_investment': 1000,  # 普通定投每月固定投入
+    'transaction_cost': 0.0,
+    # 精细6档（可按需求微调）
+    # (low, high, multiplier, label)
     'vix_rules': [
-        # (vix_low, vix_high, multiplier, label)
-        # 基于历史数据分析：VIX均值~17，90分位~30，历史极值~80
-        (0,  15, 1.0, '正常'),        # 约40%时间，牛市常态
-        (15, 20, 1.5, '轻度偏高'),    # 约25%时间，短期波动
-        (20, 25, 2.0, '中度恐慌'),    # 约15%时间，调整期
-        (25, 30, 3.0, '高度恐慌'),    # 约10%时间，明显恐慌
-        (30, 40, 5.0, '极度恐慌'),    # 约7%时间，危机初期
-        (40, 60, 8.0, '罕见恐慌'),    # 约2%时间，2008/2020级别
-        (60, 999, 12.0, '历史极值'),  # <1%时间，十年一遇黄金坑
+        (0, 15, 1.0, '正常'),
+        (15, 20, 1.5, '轻度偏高'),
+        (20, 25, 2.0, '中度恐慌'),
+        (25, 30, 3.0, '高度恐慌'),
+        (30, 40, 5.0, '极度恐慌'),
+        (40, 999, 8.0, '罕见恐慌'),
     ],
-    'risk_free_rate': 0.03,  # 无风险利率 3%（用于现金理财）
-    'transaction_cost': 0,    # 每笔交易成本（USD），默认0
 }
 
 
-def get_multiplier(vix_value):
-    """根据VIX值获取加仓倍数"""
+def get_multiplier(vix_value: float):
+    """根据VIX值返回对应倍数和标签"""
     for low, high, mult, label in BACKTEST_CONFIG['vix_rules']:
         if low <= vix_value < high:
             return mult, label
     return 1.0, '正常'
 
 
-def download_data():
-    """下载VIX和QQQ历史数据"""
-    print("正在下载历史数据...")
+def xirr(cashflows_df: pd.DataFrame):
+    """计算XIRR（年化内部收益率）。输入列: date, cashflow"""
+    cf = cashflows_df.sort_values('date').copy()
+    if cf.empty:
+        return np.nan
+    if not ((cf['cashflow'] < 0).any() and (cf['cashflow'] > 0).any()):
+        return np.nan
+
+    t0 = cf['date'].iloc[0]
+    years = (cf['date'] - t0).dt.days / 365.25
+
+    def npv(rate):
+        return np.sum(cf['cashflow'].values / np.power(1 + rate, years.values))
+
+    def d_npv(rate):
+        return np.sum(-years.values * cf['cashflow'].values / np.power(1 + rate, years.values + 1))
+
+    rate = 0.15
+    for _ in range(200):
+        f = npv(rate)
+        df = d_npv(rate)
+        if abs(df) < 1e-12:
+            break
+        new_rate = rate - f / df
+        if new_rate <= -0.999999:
+            new_rate = (rate - 0.999999) / 2
+        if abs(new_rate - rate) < 1e-10:
+            rate = new_rate
+            break
+        rate = new_rate
+
+    return rate
+
+
+def download_data(retries: int = 5):
+    """下载QQQ和VIX历史数据"""
     start = BACKTEST_CONFIG['start_date']
     end = datetime.now().strftime('%Y-%m-%d')
-    
-    # 下载 QQQ (纳斯达克100 ETF，已复权)
-    qqq = yf.download('QQQ', start=start, end=end, progress=False, auto_adjust=True)
-    # 下载 VIX
-    vix = yf.download('^VIX', start=start, end=end, progress=False, auto_adjust=True)
-    
-    # 处理多级列索引（yfinance新版本可能返回MultiIndex）
-    if isinstance(qqq.columns, pd.MultiIndex):
-        qqq.columns = qqq.columns.get_level_values(0)
-    if isinstance(vix.columns, pd.MultiIndex):
-        vix.columns = vix.columns.get_level_values(0)
-    
-    # 确保是Series或一维DataFrame
-    qqq_close = qqq['Close'].squeeze()
-    vix_close = vix['Close'].squeeze()
-    
-    # 合并数据
-    df = pd.DataFrame({
-        'QQQ': qqq_close,
-        'VIX': vix_close,
-    })
-    df = df.dropna()
-    print(f"数据下载完成，共 {len(df)} 个交易日，从 {df.index[0].strftime('%Y-%m-%d')} 到 {df.index[-1].strftime('%Y-%m-%d')}")
-    return df
+
+    for i in range(retries):
+        qqq = yf.download(BACKTEST_CONFIG['symbol'], start=start, end=end, progress=False, auto_adjust=True, threads=False)
+        vix = yf.download(BACKTEST_CONFIG['vix_symbol'], start=start, end=end, progress=False, auto_adjust=True, threads=False)
+        if len(qqq) > 0 and len(vix) > 0:
+            if isinstance(qqq.columns, pd.MultiIndex):
+                qqq.columns = qqq.columns.get_level_values(0)
+            if isinstance(vix.columns, pd.MultiIndex):
+                vix.columns = vix.columns.get_level_values(0)
+
+            df = pd.DataFrame({
+                'QQQ': qqq['Close'].squeeze(),
+                'VIX': vix['Close'].squeeze(),
+            }).dropna()
+            if not df.empty:
+                print(f"数据下载成功（尝试 {i+1}/{retries}）：{df.index[0].strftime('%Y-%m-%d')} -> {df.index[-1].strftime('%Y-%m-%d')}, 共{len(df)}个交易日")
+                return df
+
+    raise RuntimeError('下载QQQ/VIX数据失败，请稍后重试')
 
 
-def get_investment_dates(df):
-    """获取每月第N个交易日"""
-    df = df.copy()
-    df['year_month'] = df.index.to_period('M')
-    
-    # 按年月分组，取第 investment_day 个交易日
+def get_investment_dates(df: pd.DataFrame):
+    """每月第N个交易日"""
+    temp = df.copy()
+    temp['year_month'] = temp.index.to_period('M')
     n = BACKTEST_CONFIG['investment_day']
-    grouped = df.groupby('year_month')
     dates = []
-    for _, group in grouped:
-        if len(group) >= n:
-            dates.append(group.index[n - 1])
+    for _, g in temp.groupby('year_month'):
+        if len(g) >= n:
+            dates.append(g.index[n - 1])
     return pd.DatetimeIndex(dates)
 
 
-def backtest_vix_dca(df, dates, monthly_budget=None):
-    """
-    VIX增强定投策略回测
-    
-    Args:
-        monthly_budget: 每月预算上限，None表示不限制（实际投入=基础金额×倍数）
-    """
-    base_amount = BACKTEST_CONFIG['base_monthly_investment']
-    tx_cost = BACKTEST_CONFIG['transaction_cost']
-    monthly_rate = BACKTEST_CONFIG['risk_free_rate'] / 12  # 月利率
-    
-    shares = 0.0
-    cash_invested = 0.0
-    cash_balance = 0.0  # 现金余额（用于计算理财收益）
-    records = []
-    
-    for i, d in enumerate(dates):
-        # 月初现金余额计息（上个月的剩余）
-        if i > 0 and cash_balance > 0:
-            interest = cash_balance * monthly_rate
-            cash_balance += interest
-        
-        # 找到前一个交易日（用于获取VIX）
+def build_monthly_signals(df: pd.DataFrame, dates: pd.DatetimeIndex):
+    """构建每月信号（价格、前日VIX、倍数）"""
+    rows = []
+    for d in dates:
         idx = df.index.get_loc(d)
-        prev_idx = max(0, idx - 1)
-        prev_date = df.index[prev_idx]
-        
+        prev_date = df.index[max(0, idx - 1)]
         vix_value = float(df.loc[prev_date, 'VIX'])
         mult, label = get_multiplier(vix_value)
-        planned_amount = base_amount * mult
-        
-        # 如果设置了月度预算，实际投入=min(计划投入, 预算+现金余额)
-        if monthly_budget is not None:
-            available = monthly_budget + cash_balance
-            actual_amount = min(planned_amount, available)
-            cash_balance = available - actual_amount  # 剩余现金
-        else:
-            actual_amount = planned_amount
-            
         price = float(df.loc[d, 'QQQ'])
-        buy_amount = max(0, actual_amount - tx_cost)
-        buy_shares = buy_amount / price if price > 0 else 0
-        shares += buy_shares
-        cash_invested += actual_amount
-        
-        records.append({
+        rows.append({
             'date': d,
             'price': price,
             'vix': vix_value,
             'multiplier': mult,
             'label': label,
-            'planned_investment': monthly_budget if monthly_budget else planned_amount,
-            'actual_investment': actual_amount,
-            'cash_balance': cash_balance,
-            'shares': buy_shares,
-            'total_shares': shares,
-            'cash_invested': cash_invested,
-            'portfolio_value': shares * price,
-            'total_assets': shares * price + cash_balance,
         })
-    
-    return pd.DataFrame(records)
+    return pd.DataFrame(rows)
 
 
-def backtest_plain_dca_with_cash(df, dates, monthly_budget):
-    """
-    普通定投策略回测（带现金理财）
-    
-    Args:
-        monthly_budget: 每月预算（与VIX策略相同的资金池）
-    """
-    base_amount = BACKTEST_CONFIG['base_monthly_investment']
+def run_strategy(monthly_df: pd.DataFrame, investments: pd.Series, name: str):
+    """按给定月投入序列回测策略"""
     tx_cost = BACKTEST_CONFIG['transaction_cost']
-    monthly_rate = BACKTEST_CONFIG['risk_free_rate'] / 12  # 月利率
-    
-    shares = 0.0
-    cash_invested = 0.0
-    cash_balance = 0.0
+
+    total_shares = 0.0
+    cumulative_invested = 0.0
     records = []
-    
-    for i, d in enumerate(dates):
-        # 月初现金余额计息
-        if i > 0 and cash_balance > 0:
-            interest = cash_balance * monthly_rate
-            cash_balance += interest
-        
-        # 投入基础金额
-        actual_amount = min(base_amount, monthly_budget + cash_balance)
-        cash_balance = cash_balance + monthly_budget - actual_amount
-        
-        price = float(df.loc[d, 'QQQ'])
-        buy_amount = max(0, actual_amount - tx_cost)
-        buy_shares = buy_amount / price if price > 0 else 0
-        shares += buy_shares
-        cash_invested += actual_amount
-        
+
+    for _, row in monthly_df.iterrows():
+        d = row['date']
+        price = float(row['price'])
+        invest = float(investments.loc[d])
+        buy_amount = max(0.0, invest - tx_cost)
+        shares = buy_amount / price if price > 0 else 0.0
+
+        total_shares += shares
+        cumulative_invested += invest
+        portfolio_value = total_shares * price
+
         records.append({
             'date': d,
+            'strategy': name,
             'price': price,
-            'planned_investment': monthly_budget,  # 修正：记录每月预算，不是基础金额
-            'actual_investment': actual_amount,
-            'cash_balance': cash_balance,
-            'shares': buy_shares,
-            'total_shares': shares,
-            'cash_invested': cash_invested,
-            'portfolio_value': shares * price,
-            'total_assets': shares * price + cash_balance,
+            'vix': row.get('vix', np.nan),
+            'multiplier': row.get('multiplier', np.nan),
+            'label': row.get('label', ''),
+            'investment': invest,
+            'shares': shares,
+            'total_shares': total_shares,
+            'total_invested': cumulative_invested,
+            'portfolio_value': portfolio_value,
         })
-    
+
     return pd.DataFrame(records)
 
 
-def backtest_lump_sum(df, dates, total_cash):
-    """一次性投入策略回测"""
-    tx_cost = BACKTEST_CONFIG['transaction_cost']
-    first_date = dates[0]
-    price = float(df.loc[first_date, 'QQQ'])
-    buy_amount = max(0, total_cash - tx_cost)
-    shares = buy_amount / price if price > 0 else 0
-    cash_invested = total_cash
-    
-    records = []
-    for i, d in enumerate(dates):
-        price = float(df.loc[d, 'QQQ'])
-        records.append({
-            'date': d,
-            'price': price,
-            'planned_investment': total_cash if i == 0 else 0,  # 只在首月记录总预算，避免重复计算
-            'actual_investment': 0,
-            'cash_balance': 0,
-            'shares': 0,
-            'total_shares': shares,
-            'cash_invested': cash_invested,
-            'portfolio_value': shares * price,
-            'total_assets': shares * price,
-        })
-    
-    return pd.DataFrame(records)
+def build_investment_plans(monthly_df: pd.DataFrame):
+    """构建三种策略的月投入计划（同总投入）"""
+    n_months = len(monthly_df)
+    fixed = BACKTEST_CONFIG['fixed_monthly_investment']
+    total_target = fixed * n_months
+
+    # 1) 普通固定定投
+    plan_plain = pd.Series(fixed, index=monthly_df['date'])
+
+    # 2) VIX 6档等额定投：总额固定，按倍数分配
+    weights = monthly_df['multiplier'].astype(float)
+    unit = total_target / weights.sum()
+    plan_vix = pd.Series(unit * weights.values, index=monthly_df['date'])
+
+    # 3) 一次性满仓
+    lump = pd.Series(0.0, index=monthly_df['date'])
+    lump.iloc[0] = total_target
+
+    return plan_plain, plan_vix, lump, total_target, unit
 
 
-def calculate_metrics_with_cash(records_df, df_daily):
-    """计算策略绩效指标（考虑现金余额）"""
-    rec = records_df.copy()
-    
-    # 最终值（股市+现金）
-    final_stock_value = rec['portfolio_value'].iloc[-1]
-    final_cash_balance = rec['cash_balance'].iloc[-1]
-    final_total_assets = final_stock_value + final_cash_balance
-    
-    # 总现金投入（实际投入股市的）
-    total_invested = rec['cash_invested'].iloc[-1]
-    total_budget = rec['planned_investment'].sum()  # 总预算
-    
-    # 总收益率（基于总资产）
-    total_return = (final_total_assets / total_budget - 1) * 100 if total_budget > 0 else 0
-    
-    # 年化收益率 (CAGR)
+def calculate_metrics(records_df: pd.DataFrame):
+    """计算核心绩效指标"""
+    rec = records_df.copy().sort_values('date')
+
+    total_invested = float(rec['investment'].sum())
+    final_assets = float(rec['portfolio_value'].iloc[-1])
+    total_return = (final_assets / total_invested - 1) * 100 if total_invested > 0 else np.nan
+
+    # IRR口径复合年化
+    cf = pd.DataFrame({
+        'date': rec['date'],
+        'cashflow': -rec['investment'].values,
+    })
+    cf = pd.concat([
+        cf,
+        pd.DataFrame([{'date': rec['date'].iloc[-1], 'cashflow': final_assets}])
+    ], ignore_index=True)
+    irr = xirr(cf)
+
+    # 传统CAGR（非现金流口径，便于参考）
     years = (rec['date'].iloc[-1] - rec['date'].iloc[0]).days / 365.25
-    cagr = ((final_total_assets / total_budget) ** (1 / years) - 1) * 100 if years > 0 and total_budget > 0 else 0
-    
-    # 构建每日总资产序列（用于计算最大回撤）
-    shares = rec['total_shares'].iloc[-1]
-    daily_stock_values = df_daily['QQQ'] * shares
-    daily_stock_values = daily_stock_values[daily_stock_values.index >= rec['date'].iloc[0]]
-    
-    # 现金余额增长（近似按月复利）
-    # 简化处理：使用最终的 cash_balance 作为所有日期的现金值
-    # 实际上现金是逐月增长的，但对回撤计算影响不大
-    daily_total_assets = daily_stock_values + final_cash_balance
-    
-    # 最大回撤
-    running_max = daily_total_assets.cummax()
-    drawdown = (daily_total_assets - running_max) / running_max
-    max_drawdown = drawdown.min() * 100
-    
-    # 夏普比率（基于月度收益率）
-    monthly_stock_values = daily_stock_values.resample('ME').last().dropna()
-    # 总资产包含现金，现金部分增长是线性的
-    monthly_returns = monthly_stock_values.pct_change().dropna()
-    excess_returns = monthly_returns - BACKTEST_CONFIG['risk_free_rate'] / 12
-    sharpe = (excess_returns.mean() / excess_returns.std() * np.sqrt(12)) if excess_returns.std() > 0 else 0
-    
-    # 平均成本
-    avg_cost = total_invested / rec['total_shares'].iloc[-1] if rec['total_shares'].iloc[-1] > 0 else 0
-    
+    cagr = ((final_assets / total_invested) ** (1 / years) - 1) * 100 if years > 0 and total_invested > 0 else np.nan
+
+    # 最大回撤（月度净值）
+    nav = rec['portfolio_value'] / rec['investment'].sum() * len(rec) if rec['investment'].sum() > 0 else rec['portfolio_value']
+    # 用资产曲线直接算回撤，和排名表口径一致（越小越好）
+    running_max = rec['portfolio_value'].cummax()
+    drawdown = (rec['portfolio_value'] - running_max) / running_max
+    max_dd = float(drawdown.min() * 100)
+
     return {
+        'months': len(rec),
         'total_invested': total_invested,
-        'total_budget': total_budget,
-        'final_stock_value': final_stock_value,
-        'final_cash_balance': final_cash_balance,
-        'final_total_assets': final_total_assets,
-        'total_return_pct': total_return,
-        'cagr_pct': cagr,
-        'max_drawdown_pct': max_drawdown,
-        'sharpe_ratio': sharpe,
-        'avg_cost': avg_cost,
-        'years': years,
-        'cash_ratio': final_cash_balance / final_total_assets * 100 if final_total_assets > 0 else 0,
+        'final_assets': final_assets,
+        'total_return_pct': float(total_return),
+        'irr_pct': float(irr * 100) if pd.notna(irr) else np.nan,
+        'cagr_pct': float(cagr),
+        'max_drawdown_pct': max_dd,
     }
 
 
-def generate_charts(df_vix, df_plain, df_lump, df_daily, metrics_vix, metrics_plain, metrics_lump):
-    """生成回测图表"""
+def generate_charts(df_plain, df_vix, df_lump):
+    """生成图表（可选）"""
+    if not HAS_MPL:
+        print('未检测到 matplotlib，跳过图表生成')
+        return
+
     plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei', 'Arial Unicode MS']
     plt.rcParams['axes.unicode_minus'] = False
-    
-    # 准备标签（包含最终值）
-    vix_label = f"VIX增强定投: ${metrics_vix['final_total_assets']:,.0f} (投入${metrics_vix['total_invested']:,.0f})"
-    plain_label = f"普通定投+理财: ${metrics_plain['final_total_assets']:,.0f} (投入${metrics_plain['total_invested']:,.0f})"
-    lump_label = f"一次性投入: ${metrics_lump['final_total_assets']:,.0f}"
-    
-    # 1. 总资产对比图
+
+    # 1) 资产曲线
     fig, ax = plt.subplots(figsize=(14, 7))
-    
-    line1, = ax.plot(df_vix['date'], df_vix['total_assets'], linewidth=2.5, color='#e74c3c')
-    line2, = ax.plot(df_plain['date'], df_plain['total_assets'], linewidth=2.5, color='#3498db')
-    line3, = ax.plot(df_lump['date'], df_lump['total_assets'], linewidth=2.5, color='#2ecc71', linestyle='--')
-    
-    # 添加数据标签到图例
-    ax.legend([line1, line2, line3], [vix_label, plain_label, lump_label], 
-              loc='upper left', fontsize=11, framealpha=0.9)
-    
-    # 添加最终值标注
-    for df_data, color, label_text in [(df_vix, '#e74c3c', 'VIX'), 
-                                        (df_plain, '#3498db', '普通'),
-                                        (df_lump, '#2ecc71', '一次性')]:
-        final_date = df_data['date'].iloc[-1]
-        final_value = df_data['total_assets'].iloc[-1]
-        ax.annotate(f'${final_value/1000:.0f}K', 
-                   xy=(final_date, final_value),
-                   xytext=(10, 0), textcoords='offset points',
-                   fontsize=10, color=color, fontweight='bold',
-                   bbox=dict(boxstyle='round,pad=0.3', facecolor='white', alpha=0.7))
-    
-    ax.set_title('总资产对比（股市价值 + 现金余额）', fontsize=16, fontweight='bold')
-    ax.set_xlabel('日期', fontsize=12)
-    ax.set_ylabel('总资产 (USD)', fontsize=12)
-    ax.grid(True, alpha=0.3)
-    ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'${x/1000:.0f}K'))
+    ax.plot(df_plain['date'], df_plain['portfolio_value'], label='普通固定定投', linewidth=2.2, color='#1f77b4')
+    ax.plot(df_vix['date'], df_vix['portfolio_value'], label='精细6档 VIX 等额定投', linewidth=2.2, color='#d62728')
+    ax.plot(df_lump['date'], df_lump['portfolio_value'], label='一次性满仓', linewidth=2.2, color='#2ca02c', linestyle='--')
+    ax.set_title('三策略资产曲线对比')
+    ax.set_xlabel('日期')
+    ax.set_ylabel('资产 (USD)')
+    ax.grid(alpha=0.3)
+    ax.legend()
     plt.tight_layout()
     plt.savefig(CHARTS_DIR / 'total_assets_comparison.png', dpi=150)
     plt.close()
-    
-    # 2. 股市价值对比图（只看股票部分）
-    fig, ax = plt.subplots(figsize=(14, 7))
-    
-    vix_stock_label = f"VIX策略股市持仓: ${metrics_vix['final_stock_value']:,.0f}"
-    plain_stock_label = f"普通定投股市持仓: ${metrics_plain['final_stock_value']:,.0f}"
-    lump_stock_label = f"一次性投入股市持仓: ${metrics_lump['final_stock_value']:,.0f}"
-    
-    line1, = ax.plot(df_vix['date'], df_vix['portfolio_value'], linewidth=2.5, color='#e74c3c')
-    line2, = ax.plot(df_plain['date'], df_plain['portfolio_value'], linewidth=2.5, color='#3498db')
-    line3, = ax.plot(df_lump['date'], df_lump['portfolio_value'], linewidth=2.5, color='#2ecc71', linestyle='--')
-    
-    ax.legend([line1, line2, line3], [vix_stock_label, plain_stock_label, lump_stock_label], 
-              loc='upper left', fontsize=11, framealpha=0.9)
-    
-    # 添加最终值标注
-    for df_data, color in [(df_vix, '#e74c3c'), (df_plain, '#3498db'), (df_lump, '#2ecc71')]:
-        final_date = df_data['date'].iloc[-1]
-        final_value = df_data['portfolio_value'].iloc[-1]
-        ax.annotate(f'${final_value/1000:.0f}K', 
-                   xy=(final_date, final_value),
-                   xytext=(10, 0), textcoords='offset points',
-                   fontsize=10, color=color, fontweight='bold',
-                   bbox=dict(boxstyle='round,pad=0.3', facecolor='white', alpha=0.7))
-    
-    ax.set_title('股市持仓价值对比（不含现金余额）', fontsize=16, fontweight='bold')
-    ax.set_xlabel('日期', fontsize=12)
-    ax.set_ylabel('持仓价值 (USD)', fontsize=12)
-    ax.grid(True, alpha=0.3)
-    ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'${x/1000:.0f}K'))
-    plt.tight_layout()
-    plt.savefig(CHARTS_DIR / 'stock_value_comparison.png', dpi=150)
-    plt.close()
-    
-    # 3. VIX策略现金余额变化
+
+    # 2) 回撤曲线
     fig, ax = plt.subplots(figsize=(14, 6))
-    
-    final_cash_vix = df_vix['cash_balance'].iloc[-1]
-    ax.fill_between(df_vix['date'], df_vix['cash_balance'], alpha=0.3, color='#95a5a6', label=f'现金余额（含理财收益）')
-    ax.plot(df_vix['date'], df_vix['cash_balance'], color='#7f8c8d', linewidth=2, label='余额曲线')
-    ax.axhline(y=0, color='red', linestyle='--', alpha=0.5, label='零线')
-    
-    # 标注最终余额
-    ax.annotate(f'最终余额: ${final_cash_vix:,.0f}', 
-               xy=(df_vix['date'].iloc[-1], final_cash_vix),
-               xytext=(10, 0), textcoords='offset points',
-               fontsize=11, color='#2c3e50', fontweight='bold',
-               bbox=dict(boxstyle='round,pad=0.3', facecolor='white', alpha=0.8))
-    
-    ax.set_title('VIX策略：现金余额变化（恐慌时投入，平时积累）', fontsize=14, fontweight='bold')
-    ax.set_xlabel('日期', fontsize=12)
-    ax.set_ylabel('现金余额 (USD)', fontsize=12)
-    ax.legend(loc='upper left', fontsize=10)
-    ax.grid(True, alpha=0.3)
-    ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'${x/1000:.0f}K'))
+    for name, df, color in [
+        ('普通固定定投', df_plain, '#1f77b4'),
+        ('精细6档 VIX 等额定投', df_vix, '#d62728'),
+        ('一次性满仓', df_lump, '#2ca02c'),
+    ]:
+        dd = (df['portfolio_value'] / df['portfolio_value'].cummax() - 1) * 100
+        ax.plot(df['date'], dd, label=name, linewidth=2.0, color=color)
+    ax.set_title('三策略回撤曲线')
+    ax.set_xlabel('日期')
+    ax.set_ylabel('回撤(%)')
+    ax.grid(alpha=0.3)
+    ax.legend()
     plt.tight_layout()
-    plt.savefig(CHARTS_DIR / 'vix_cash_balance.png', dpi=150)
+    plt.savefig(CHARTS_DIR / 'drawdown_comparison.png', dpi=150)
     plt.close()
-    
-    # 4. 普通定投现金余额变化
-    fig, ax = plt.subplots(figsize=(14, 6))
-    
-    final_cash_plain = df_plain['cash_balance'].iloc[-1]
-    ax.fill_between(df_plain['date'], df_plain['cash_balance'], alpha=0.3, color='#3498db', label=f'现金余额（含3%理财收益）')
-    ax.plot(df_plain['date'], df_plain['cash_balance'], color='#2980b9', linewidth=2, label='余额曲线')
-    ax.axhline(y=0, color='red', linestyle='--', alpha=0.5, label='零线')
-    
-    # 标注最终余额
-    ax.annotate(f'最终余额: ${final_cash_plain:,.0f}', 
-               xy=(df_plain['date'].iloc[-1], final_cash_plain),
-               xytext=(10, 0), textcoords='offset points',
-               fontsize=11, color='#2c3e50', fontweight='bold',
-               bbox=dict(boxstyle='round,pad=0.3', facecolor='white', alpha=0.8))
-    
-    ax.set_title('普通定投：现金余额变化（每月只投基础金额，剩余买理财）', fontsize=14, fontweight='bold')
-    ax.set_xlabel('日期', fontsize=12)
-    ax.set_ylabel('现金余额 (USD)', fontsize=12)
-    ax.legend(loc='upper left', fontsize=10)
-    ax.grid(True, alpha=0.3)
-    ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'${x/1000:.0f}K'))
-    plt.tight_layout()
-    plt.savefig(CHARTS_DIR / 'plain_cash_balance.png', dpi=150)
-    plt.close()
-    
-    # 5. VIX策略月度投入金额图
-    fig, ax = plt.subplots(figsize=(16, 7))
-    
-    # 扩展颜色映射以支持7档
-    colors = {
-        '正常': '#3498db',         # 蓝色
-        '轻度偏高': '#5dade2',     # 浅蓝
-        '中度恐慌': '#f1c40f',     # 黄色
-        '高度恐慌': '#e67e22',     # 橙色
-        '极度恐慌': '#e74c3c',     # 红色
-        '罕见恐慌': '#8e44ad',     # 紫色
-        '历史极值': '#2c3e50',     # 黑色
-    }
-    bar_colors = [colors.get(l, '#95a5a6') for l in df_vix['label']]
-    
-    bars = ax.bar(df_vix['date'], df_vix['actual_investment'], color=bar_colors, width=20)
-    ax.axhline(y=BACKTEST_CONFIG['base_monthly_investment'], color='gray', linestyle='--', 
-               alpha=0.8, linewidth=2, label=f'基础定投额 ${BACKTEST_CONFIG["base_monthly_investment"]:,}')
-    ax.axhline(y=BACKTEST_CONFIG['base_monthly_investment']*5, color='orange', linestyle=':', 
-               alpha=0.6, label='5倍线')
-    ax.axhline(y=BACKTEST_CONFIG['base_monthly_investment']*12, color='red', linestyle=':', 
-               alpha=0.6, label='12倍线（历史极值）')
-    
-    ax.set_title('VIX策略：每月实际投入金额（不同颜色代表不同恐慌级别）', fontsize=16, fontweight='bold')
-    ax.set_xlabel('日期', fontsize=12)
-    ax.set_ylabel('投入金额 (USD)', fontsize=12)
-    
-    # 添加图例说明
-    from matplotlib.patches import Patch
-    legend_elements = []
-    for label, color in colors.items():
-        if label in df_vix['label'].values:
-            # 找出该标签对应的倍数
-            mult = df_vix[df_vix['label'] == label]['multiplier'].iloc[0] if len(df_vix[df_vix['label'] == label]) > 0 else 1
-            legend_elements.append(Patch(facecolor=color, label=f'{label} ({mult:.1f}x)'))
-    
-    # 添加水平线到图例
-    from matplotlib.lines import Line2D
-    legend_elements.append(Line2D([0], [0], color='gray', linestyle='--', label=f'基础定投额'))
-    
-    ax.legend(handles=legend_elements, loc='upper left', fontsize=10, ncol=2)
-    ax.grid(True, alpha=0.3, axis='y')
-    ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'${x/1000:.0f}K'))
+
+    # 3) VIX等额定投月投入
+    fig, ax = plt.subplots(figsize=(16, 6))
+    ax.bar(df_vix['date'], df_vix['investment'], width=20, color='#d62728', alpha=0.8)
+    ax.set_title('精细6档 VIX 等额定投：月投入金额')
+    ax.set_xlabel('日期')
+    ax.set_ylabel('投入金额 (USD)')
+    ax.grid(alpha=0.25, axis='y')
     plt.tight_layout()
     plt.savefig(CHARTS_DIR / 'monthly_investment.png', dpi=150)
     plt.close()
-    
-    print(f"图表已保存到 {CHARTS_DIR}")
+
+    print(f'图表已保存到: {CHARTS_DIR}')
 
 
-def generate_report(metrics_vix, metrics_plain, metrics_lump, df_vix, df_plain):
-    """生成Markdown回测报告"""
+def generate_report(metrics_plain, metrics_vix, metrics_lump, total_target, unit_amount, df_vix):
+    """生成Markdown报告"""
     now = datetime.now().strftime('%Y-%m-%d %H:%M')
-    total_months = len(df_vix)
-    enhanced_months = len(df_vix[df_vix['multiplier'] > 1.0])
-    extreme_months = len(df_vix[df_vix['multiplier'] >= 5.0])
-    
-    # 计算累计投入差额
-    vix_extra_invested = metrics_vix['total_invested'] - metrics_plain['total_invested']
-    vix_extra_return = metrics_vix['final_total_assets'] - metrics_plain['final_total_assets']
-    
-    lines = [
-        "# VIX-纳斯达克100定投策略回测报告",
-        "",
-        f"> **生成时间**: {now}",
-        f"> **数据范围**: {BACKTEST_CONFIG['start_date']} 至今",
-        f"> **标的**: QQQ (Invesco QQQ Trust - 纳斯达克100 ETF)",
-        f"> **恐慌指数**: ^VIX (CBOE Volatility Index)",
-        f"> **无风险利率**: {BACKTEST_CONFIG['risk_free_rate']*100:.0f}%（现金理财年化）",
-        "",
-        "---",
-        "",
-        "## 核心观点",
-        "",
-        f"**相同资金池对比**：假设每月有 **${max(df_vix['planned_investment']):.0f}** 预算",
-        "",
-        "| 对比维度 | VIX增强定投 | 普通定投+理财 |",
-        "|----------|-------------|---------------|",
-        f"| **最终总资产** | **${metrics_vix['final_total_assets']:,.2f}** | ${metrics_plain['final_total_assets']:,.2f} |",
-        f"| 股市持仓价值 | ${metrics_vix['final_stock_value']:,.2f} | ${metrics_plain['final_stock_value']:,.2f} |",
-        f"| 现金余额 | ${metrics_vix['final_cash_balance']:,.2f} | ${metrics_plain['final_cash_balance']:,.2f} |",
-        f"| 累计投入股市 | ${metrics_vix['total_invested']:,.2f} | ${metrics_plain['total_invested']:,.2f} |",
-        f"| 累计投入差额 | +${vix_extra_invested:,.2f} | - |",
-        f"| **总资产收益** | **{metrics_vix['total_return_pct']:+.2f}%** | {metrics_plain['total_return_pct']:+.2f}% |",
-        f"| 最终资金效率 | {'VIX更优' if metrics_vix['final_total_assets'] > metrics_plain['final_total_assets'] else '普通更优'} | - |",
-        "",
-        "> 💡 **结论**：",
-        f"> - VIX策略多投入 **${vix_extra_invested:,.0f}** 到股市",
-        f"> - 最终总资产 {'多赚' if vix_extra_return > 0 else '少赚'} **${abs(vix_extra_return):,.2f}**",
-        f"> - 额外投入的资金 {'产生正收益' if vix_extra_return > 0 else '产生负收益'}",
-        "",
-        "---",
-        "",
-        "## 策略说明",
-        "",
-        "### 相同资金池对比逻辑",
-        "",
-        "本回测采用**公平对比**方式：",
-        "",
-        "1. **每月预算相同**：两个策略每月都有相同的资金预算",
-        "2. **VIX策略**：恐慌时投入更多，现金余额少，大部分资金在股市",
-        "3. **普通定投**：每月只投基础金额，剩余现金买理财（3%年化）",
-        "4. **对比维度**：最终总资产 = 股市价值 + 现金余额（含理财收益）",
-        "",
-        "### 定投规则",
-        "",
-        f"- **每月预算**: ${max(df_vix['planned_investment']):.0f} USD/月",
-        f"- **基础定投金额**: {BACKTEST_CONFIG['base_monthly_investment']} USD/月",
-        f"- **定投日**: 每月第 {BACKTEST_CONFIG['investment_day']} 个交易日",
-        f"- **现金理财利率**: {BACKTEST_CONFIG['risk_free_rate']*100:.0f}% 年化",
-        "",
-        "- **VIX加仓规则**（以前一交易日VIX收盘价为准）：",
-        "",
-        "| VIX区间 | 加仓倍数 | 市场情绪 |",
-        "|---------|----------|----------|",
+
+    # 按总收益率排序
+    ranking = [
+        ('普通固定定投', metrics_plain),
+        ('精细 6 档 VIX 等额定投', metrics_vix),
+        ('一次性满仓', metrics_lump),
     ]
-    
+
+    lines = [
+        '# VIX-纳斯达克100定投策略回测报告（同总投入口径）',
+        '',
+        f'> **生成时间**: {now}',
+        f"> **数据范围**: {BACKTEST_CONFIG['start_date']} 至今",
+        f"> **标的**: {BACKTEST_CONFIG['symbol']} (Invesco QQQ Trust - 纳斯达克100 ETF)",
+        f"> **恐慌指数**: {BACKTEST_CONFIG['vix_symbol']} (CBOE Volatility Index)",
+        '',
+        '---',
+        '',
+        '## 回测前提（关键）',
+        '',
+        f"- 三种策略 **总投入严格一致**：`${total_target:,.0f}`",
+        f"- 普通定投：每月固定 `${BACKTEST_CONFIG['fixed_monthly_investment']:,.0f}`",
+        f"- VIX等额定投：按6档倍数分配，单位投入约 `${unit_amount:,.2f}`，总额仍为 `${total_target:,.0f}`",
+        '- 一次性满仓：首月一次性投入全部资金',
+        '',
+        '## 排名维度参考',
+        '',
+        '| 策略 | 总投入 | 期末资产 | 总收益率 | 复合年化(IRR) | 最大回撤 |',
+        '|------|--------|----------|----------|---------------|----------|',
+        f"| 普通固定定投 | ${metrics_plain['total_invested']:,.0f} | ${metrics_plain['final_assets']:,.2f} | {metrics_plain['total_return_pct']:.2f}% | {metrics_plain['irr_pct']:.2f}% | {abs(metrics_plain['max_drawdown_pct']):.2f}% |",
+        f"| 精细 6 档 VIX 等额定投 | ${metrics_vix['total_invested']:,.0f} | ${metrics_vix['final_assets']:,.2f} | {metrics_vix['total_return_pct']:.2f}% | {metrics_vix['irr_pct']:.2f}% | {abs(metrics_vix['max_drawdown_pct']):.2f}% |",
+        f"| 一次性满仓 | ${metrics_lump['total_invested']:,.0f} | ${metrics_lump['final_assets']:,.2f} | {metrics_lump['total_return_pct']:.2f}% | {metrics_lump['irr_pct']:.2f}% | {abs(metrics_lump['max_drawdown_pct']):.2f}% |",
+        '',
+        '## VIX 6档规则',
+        '',
+        '| VIX区间 | 倍数 | 标签 |',
+        '|---------|------|------|',
+    ]
+
     for low, high, mult, label in BACKTEST_CONFIG['vix_rules']:
         if high >= 999:
-            high_str = f"≥ {low}"
+            scope = f">= {low}"
         else:
-            high_str = f"{low}-{high}"
-        lines.append(f"| {high_str} | {mult:.1f}x | {label} |")
-    
+            scope = f"{low}-{high}"
+        lines.append(f'| {scope} | {mult:.1f}x | {label} |')
+
     lines.extend([
-        "",
-        "---",
-        "",
-        "## 详细回测结果",
-        "",
-        "### 核心指标对比",
-        "",
-        "| 指标 | VIX增强定投 | 普通定投+理财 | 一次性投入 |",
-        "|------|-------------|---------------|------------|",
-        f"| **最终总资产** | **${metrics_vix['final_total_assets']:,.2f}** | ${metrics_plain['final_total_assets']:,.2f} | ${metrics_lump['final_total_assets']:,.2f} |",
-        f"| 股市持仓价值 | ${metrics_vix['final_stock_value']:,.2f} | ${metrics_plain['final_stock_value']:,.2f} | ${metrics_lump['final_stock_value']:,.2f} |",
-        f"| 现金余额 | ${metrics_vix['final_cash_balance']:,.2f} | ${metrics_plain['final_cash_balance']:,.2f} | $0.00 |",
-        f"| 累计投入股市 | ${metrics_vix['total_invested']:,.2f} | ${metrics_plain['total_invested']:,.2f} | ${metrics_lump['total_invested']:,.2f} |",
-        f"| 总资产收益率 | {metrics_vix['total_return_pct']:+.2f}% | {metrics_plain['total_return_pct']:+.2f}% | {metrics_lump['total_return_pct']:+.2f}% |",
-        f"| 年化收益率 (CAGR) | {metrics_vix['cagr_pct']:+.2f}% | {metrics_plain['cagr_pct']:+.2f}% | {metrics_lump['cagr_pct']:+.2f}% |",
-        f"| 最大回撤 | {metrics_vix['max_drawdown_pct']:.2f}% | {metrics_plain['max_drawdown_pct']:.2f}% | {metrics_lump['max_drawdown_pct']:.2f}% |",
-        f"| 夏普比率 | {metrics_vix['sharpe_ratio']:.2f} | {metrics_plain['sharpe_ratio']:.2f} | {metrics_lump['sharpe_ratio']:.2f} |",
-        f"| 平均持仓成本 | ${metrics_vix['avg_cost']:.2f} | ${metrics_plain['avg_cost']:.2f} | ${metrics_lump['avg_cost']:.2f} |",
-        "",
-        "### VIX策略执行统计",
-        "",
-        f"- **总定投月数**: {total_months} 个月",
-        f"- **触发加仓月数** (倍数>1): {enhanced_months} 个月 ({enhanced_months/total_months*100:.1f}%)",
-        f"- **极度恐慌月数** (5倍): {extreme_months} 个月 ({extreme_months/total_months*100:.1f}%)",
-        f"- **累计投入差额**: ${vix_extra_invested:,.2f}（相比普通定投多投入）",
-        f"- **累计理财收益（普通定投）**: ${metrics_plain['final_cash_balance'] - (metrics_plain['total_budget'] - metrics_plain['total_invested']):,.2f}",
-        "",
-        "---",
-        "",
-        "## 图表",
-        "",
-        "### 总资产对比（股市价值+现金余额）",
-        f"![总资产对比](./charts/total_assets_comparison.png)",
-        "",
-        "### 股市持仓价值对比",
-        f"![股市价值对比](./charts/stock_value_comparison.png)",
-        "",
-        "### VIX策略现金余额变化",
-        f"![VIX现金余额](./charts/vix_cash_balance.png)",
-        "",
-        "### 普通定投现金余额变化",
-        f"![普通定投现金余额](./charts/plain_cash_balance.png)",
-        "",
-        "### VIX策略每月投入金额",
-        f"![每月投入金额](./charts/monthly_investment.png)",
-        "",
-        "---",
-        "",
-        "## 关键结论",
-        "",
+        '',
+        '### 执行统计',
+        f"- 定投月数：{len(df_vix)}",
+        f"- 触发加仓月数（>1x）：{int((df_vix['multiplier'] > 1).sum())}",
+        f"- 高恐慌月数（>=5x）：{int((df_vix['multiplier'] >= 5).sum())}",
+        '',
+        '## 图表',
+        '',
+        '![总资产对比](./charts/total_assets_comparison.png)',
+        '',
+        '![回撤对比](./charts/drawdown_comparison.png)',
+        '',
+        '![VIX月投入](./charts/monthly_investment.png)',
+        '',
+        '---',
+        '',
+        '*报告由 `scripts/vix_ndx_backtest.py` 自动生成*',
     ])
-    
-    # 自动结论
-    winner = "VIX增强定投" if metrics_vix['final_total_assets'] > metrics_plain['final_total_assets'] else "普通定投+理财"
-    margin = abs(metrics_vix['final_total_assets'] - metrics_plain['final_total_assets']) / metrics_plain['final_total_assets'] * 100
-    
-    lines.append(f"1. **相同资金池对比**：在 {metrics_vix['years']:.1f} 年回测期内，**{winner}** 的最终总资产更高，领先 **{margin:.2f}%**。")
-    
-    if vix_extra_return > 0:
-        lines.append(f"2. **VIX策略有效性**：VIX策略比普通定投多投入 ${vix_extra_invested:,.0f} 到股市，最终多赚 ${vix_extra_return:,.2f}，说明恐慌时加仓有效提升了整体收益。")
-    else:
-        lines.append(f"2. **VIX策略观察**：VIX策略比普通定投多投入 ${vix_extra_invested:,.0f} 到股市，但最终少赚 ${abs(vix_extra_return):,.2f}，说明恐慌加仓时点可能过早（接飞刀），或牛市中资金利用率不如理财。")
-    
-    # 现金效率分析
-    vix_cash_ratio = metrics_vix['final_cash_balance'] / metrics_vix['final_total_assets'] * 100
-    plain_cash_ratio = metrics_plain['final_cash_balance'] / metrics_plain['final_total_assets'] * 100
-    lines.append(f"3. **现金利用率**：VIX策略最终现金占比 {vix_cash_ratio:.1f}%，普通定投现金占比 {plain_cash_ratio:.1f}%。VIX策略资金利用率更高。")
-    
-    # 风险对比
-    if metrics_vix['max_drawdown_pct'] < metrics_plain['max_drawdown_pct']:
-        lines.append(f"4. **风险控制**：VIX策略最大回撤 ({metrics_vix['max_drawdown_pct']:.2f}%) 小于普通定投 ({metrics_plain['max_drawdown_pct']:.2f}%)，说明低位摊薄成本有效降低了波动。")
-    else:
-        lines.append(f"4. **风险对比**：VIX策略最大回撤 ({metrics_vix['max_drawdown_pct']:.2f}%) 与普通定投 ({metrics_plain['max_drawdown_pct']:.2f}%) 相当或略高，承担了更多波动。")
-    
-    lines.extend([
-        "",
-        "### 风险提示",
-        "",
-        "- VIX策略需要**更强的现金流纪律**，恐慌时期月投入可能达到基础金额的 5 倍，需确保资金链不断裂。",
-        "- 本回测中普通定投的现金理财收益按 3% 年化计算，实际收益可能因市场利率变化而不同。",
-        "- 历史回测不代表未来表现，VIX与QQQ的相关性可能随市场环境变化。",
-        "- 本回测未考虑交易成本、税费、汇率（若用非美元资金）及滑点。",
-        "",
-        "---",
-        "",
-        "*报告由 `scripts/vix_ndx_backtest.py` 自动生成*",
-    ])
-    
+
     REPORT_FILE.write_text('\n'.join(lines), encoding='utf-8')
-    print(f"报告已生成: {REPORT_FILE}")
+    print(f'报告已生成: {REPORT_FILE}')
 
 
 def main():
-    print("=" * 70)
-    print("VIX-纳斯达克100定投回测 V2.0")
-    print("相同资金池对比（股市+现金理财）")
-    print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print("=" * 70)
-    
+    print('=' * 72)
+    print('VIX-纳斯达克100回测 V3.0（同总投入、无现金留存）')
+    print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+    print('=' * 72)
+
     df = download_data()
     dates = get_investment_dates(df)
-    print(f"共 {len(dates)} 个定投月")
-    
-    # 先跑一次VIX策略，确定每月预算上限
-    df_vix_temp = backtest_vix_dca(df, dates, monthly_budget=None)
-    max_monthly = df_vix_temp['planned_investment'].max()
-    print(f"VIX策略月度投入范围: ${df_vix_temp['actual_investment'].min():.0f} ~ ${max_monthly:.0f}")
-    
-    # 正式回测：使用相同资金池
-    df_vix = backtest_vix_dca(df, dates, monthly_budget=max_monthly)
-    df_plain = backtest_plain_dca_with_cash(df, dates, monthly_budget=max_monthly)
-    total_budget = df_vix['planned_investment'].sum()
-    df_lump = backtest_lump_sum(df, dates, total_budget)
-    
-    # 计算指标（考虑现金）
-    metrics_vix = calculate_metrics_with_cash(df_vix, df)
-    metrics_plain = calculate_metrics_with_cash(df_plain, df)
-    metrics_lump = calculate_metrics_with_cash(df_lump, df)
-    
-    print("\n" + "=" * 70)
-    print("相同资金池回测结果对比")
-    print("=" * 70)
-    print(f"{'指标':<25} {'VIX增强定投':>18} {'普通定投+理财':>18} {'一次性投入':>18}")
-    print("-" * 70)
-    print(f"{'最终总资产':<25} ${metrics_vix['final_total_assets']:>16,.0f} ${metrics_plain['final_total_assets']:>16,.0f} ${metrics_lump['final_total_assets']:>16,.0f}")
-    print(f"{'股市持仓价值':<25} ${metrics_vix['final_stock_value']:>16,.0f} ${metrics_plain['final_stock_value']:>16,.0f} ${metrics_lump['final_stock_value']:>16,.0f}")
-    print(f"{'现金余额':<25} ${metrics_vix['final_cash_balance']:>16,.0f} ${metrics_plain['final_cash_balance']:>16,.0f} ${metrics_lump['final_cash_balance']:>16,.0f}")
-    print(f"{'累计投入股市':<25} ${metrics_vix['total_invested']:>16,.0f} ${metrics_plain['total_invested']:>16,.0f} ${metrics_lump['total_invested']:>16,.0f}")
-    print(f"{'总资产收益率':<25} {metrics_vix['total_return_pct']:>17.2f}% {metrics_plain['total_return_pct']:>17.2f}% {metrics_lump['total_return_pct']:>17.2f}%")
-    print(f"{'年化收益率(CAGR)':<25} {metrics_vix['cagr_pct']:>17.2f}% {metrics_plain['cagr_pct']:>17.2f}% {metrics_lump['cagr_pct']:>17.2f}%")
-    print(f"{'最大回撤':<25} {metrics_vix['max_drawdown_pct']:>17.2f}% {metrics_plain['max_drawdown_pct']:>17.2f}% {metrics_lump['max_drawdown_pct']:>17.2f}%")
-    print("=" * 70)
-    
-    # 生成图表和报告
-    generate_charts(df_vix, df_plain, df_lump, df, metrics_vix, metrics_plain, metrics_lump)
-    generate_report(metrics_vix, metrics_plain, metrics_lump, df_vix, df_plain)
-    
-    print("\n回测完成！")
+    monthly = build_monthly_signals(df, dates)
+
+    plan_plain, plan_vix, plan_lump, total_target, unit_amount = build_investment_plans(monthly)
+
+    df_plain = run_strategy(monthly, plan_plain, '普通固定定投')
+    df_vix = run_strategy(monthly, plan_vix, '精细 6 档 VIX 等额定投')
+    df_lump = run_strategy(monthly, plan_lump, '一次性满仓')
+
+    m_plain = calculate_metrics(df_plain)
+    m_vix = calculate_metrics(df_vix)
+    m_lump = calculate_metrics(df_lump)
+
+    print('\n排名维度参考\t总投入\t期末资产\t总收益率\t复合年化(IRR)\t最大回撤')
+    print(f"① 普通固定定投\t${m_plain['total_invested']:.0f}\t${m_plain['final_assets']:.0f}\t{m_plain['total_return_pct']:.2f}%\t{m_plain['irr_pct']:.2f}%\t{abs(m_plain['max_drawdown_pct']):.2f}%")
+    print(f"② 精细6档 VIX 等额定投\t${m_vix['total_invested']:.0f}\t${m_vix['final_assets']:.0f}\t{m_vix['total_return_pct']:.2f}%\t{m_vix['irr_pct']:.2f}%\t{abs(m_vix['max_drawdown_pct']):.2f}%")
+    print(f"③ 一次性满仓\t${m_lump['total_invested']:.0f}\t${m_lump['final_assets']:.0f}\t{m_lump['total_return_pct']:.2f}%\t{m_lump['irr_pct']:.2f}%\t{abs(m_lump['max_drawdown_pct']):.2f}%")
+
+    generate_charts(df_plain, df_vix, df_lump)
+    generate_report(m_plain, m_vix, m_lump, total_target, unit_amount, df_vix)
 
 
 if __name__ == '__main__':
