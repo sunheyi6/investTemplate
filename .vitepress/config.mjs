@@ -39,7 +39,7 @@ export default defineConfig({
           { text: '个股分析标准模版', link: '/个股分析标准模版' },
           { text: '🎯 模拟持仓（实时）', link: '/模拟持仓/持仓' },
           { text: '项目介绍', link: '/README' },
-          { text: '项目结构说明', link: '/项目结构说明' },
+          { text: '项目结构说明', link: '/docs/项目结构说明' },
           { text: '更新日志', link: '/docs/CHANGELOG' }
         ]
       },
