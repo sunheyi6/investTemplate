@@ -45,8 +45,8 @@ features:
     title: 模拟持仓仪表盘
     details: 单页仪表盘查看真实持仓、今日操作与决策记录，统一数据快照口径
   - icon: 📈
-    title: VIX定投策略
-    details: 基于恐慌指数的纳指100 ETF定投策略，高VIX多买低VIX减仓，每两周周二执行
+    title: VIX定投策略（513110）
+    details: 基于VIX恐慌指数的纳指100 ETF（513110）定投策略，高VIX多买低VIX减仓，每两周周二执行
   - icon: 🛡️
     title: 严格风控体系
     details: 分级数据源(S-D级)、仓位限制、止损规则、强制性核查清单
