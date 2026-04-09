@@ -1,40 +1,40 @@
 {
   "strategy": "VIX定投策略_纳指100",
   "version": "V1.0",
-  "last_update": "2026-04-08",
+  "last_update": "2026-04-09",
   "account": {
     "initial_capital": 100000,
     "cash": 90897.0,
-    "total_assets": 100344.0
+    "total_assets": 99041.52
   },
   "position": {
     "etf_code": "513110",
     "etf_name": "纳斯达克100 ETF",
     "shares": 4020,
     "avg_cost": 2.265,
-    "current_price": 2.35,
-    "market_value": 9447.0,
+    "current_price": 2.026,
+    "market_value": 8144.52,
     "total_cost": 9103.0,
-    "unrealized_pnl": 344.0,
-    "return_pct": 3.78
+    "unrealized_pnl": -958.48,
+    "return_pct": -10.53
   },
   "performance": {
-    "total_pnl": 344.0,
-    "total_return_pct": 0.34,
-    "daily_pnl": 281.4,
-    "vix": 29.50,
-    "date": "2026-04-08"
+    "total_pnl": -958.48,
+    "total_return_pct": -0.96,
+    "daily_pnl": -1302.48,
+    "vix": 21.23,
+    "date": "2026-04-09"
   },
   "schedule": {
     "frequency": "每两周周二",
     "last_trade_date": "2026-04-07",
     "next_trade_date": "2026-04-21",
-    "days_until_next": 13
+    "days_until_next": 12
   },
   "recent_trades": [
     {
       "date": "2026-04-07",
-      "vix": 31.20,
+      "vix": 31.2,
       "action": "BUY",
       "amount": 6000,
       "shares": 2625,
@@ -43,7 +43,7 @@
     },
     {
       "date": "2026-03-26",
-      "vix": 22.50,
+      "vix": 22.5,
       "action": "BUY",
       "amount": 3000,
       "shares": 1395,
@@ -52,10 +52,41 @@
     }
   ],
   "daily_snapshots": [
-    {"date": "2026-04-08", "price": 2.35, "pnl": 344.0, "daily_pnl": 281.4},
-    {"date": "2026-04-07", "price": 2.28, "pnl": 62.6, "daily_pnl": -212.65},
-    {"date": "2026-04-06", "price": 2.35, "pnl": 275.25, "daily_pnl": 41.85},
-    {"date": "2026-04-03", "price": 2.32, "pnl": 233.4, "daily_pnl": 27.9},
-    {"date": "2026-04-02", "price": 2.30, "pnl": 205.5, "daily_pnl": 27.9}
+    {
+      "date": "2026-04-09",
+      "price": 2.026,
+      "pnl": -958.48,
+      "daily_pnl": -1302.48
+    },
+    {
+      "date": "2026-04-08",
+      "price": 2.35,
+      "pnl": 344.0,
+      "daily_pnl": 281.4
+    },
+    {
+      "date": "2026-04-07",
+      "price": 2.28,
+      "pnl": 62.6,
+      "daily_pnl": -212.65
+    },
+    {
+      "date": "2026-04-06",
+      "price": 2.35,
+      "pnl": 275.25,
+      "daily_pnl": 41.85
+    },
+    {
+      "date": "2026-04-03",
+      "price": 2.32,
+      "pnl": 233.4,
+      "daily_pnl": 27.9
+    },
+    {
+      "date": "2026-04-02",
+      "price": 2.3,
+      "pnl": 205.5,
+      "daily_pnl": 27.9
+    }
   ]
 }
