@@ -73,6 +73,12 @@
     ]
   },
   "today_actions": [],
+  "recent_actions": [
+    {"date": "2026-03-26", "ticker": "1522.HK", "name": "京投交通科技", "action": "INIT_BUY", "price": 0.295, "shares": 342000, "amount": 100890.0, "reason": "初始建仓（3月26日收盘价）"},
+    {"date": "2026-03-26", "ticker": "87001.HK", "name": "汇贤产业信托", "action": "INIT_BUY", "price": 0.432, "shares": 250000, "amount": 108000.0, "reason": "初始建仓（3月26日收盘价）"},
+    {"date": "2026-03-26", "ticker": "0882.HK", "name": "天津发展", "action": "INIT_BUY", "price": 2.55, "shares": 40000, "amount": 102000.0, "reason": "初始建仓（3月26日收盘价）"},
+    {"date": "2026-03-26", "ticker": "3320.HK", "name": "华润医药", "action": "INIT_BUY", "price": 5.33, "shares": 15000, "amount": 79950.0, "reason": "初始建仓（3月26日收盘价）"}
+  ],
   "summary": {
     "winners": ["华润医药", "京投交通科技", "汇贤产业信托"],
     "losers": ["天津发展"],
