@@ -3,7 +3,7 @@
   "engine_version": "V3.0",
   "initial_capital": 500000.0,
   "cash": 109160.0,
-  "last_trade_date": "2026-04-09",
+  "last_trade_date": "2026-03-26",
   "positions": {
     "1522.HK": {
       "name": "京投交通科技",
@@ -14,8 +14,7 @@
       "sell_trigger": 0.6,
       "lot_size": 1000,
       "position_type": "核心",
-      "realized_pnl": 0.0,
-      "target_buy": 0.3
+      "realized_pnl": 0.0
     },
     "87001.HK": {
       "name": "汇贤产业信托",

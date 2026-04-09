@@ -1,18 +1,17 @@
 {
   "meta": {
     "template_version": "V5.5.12",
-    "engine_version": "V3.1-fixed",
-    "generated_at": "2026-04-08",
-    "latest_trade_date": "2026-04-08",
-    "note": "已修正：按3月26日收盘价建仓"
+    "engine_version": "V3.1",
+    "generated_at": "2026-04-09 09:55:05",
+    "latest_trade_date": "2026-04-09"
   },
   "portfolio": {
     "initial_capital": 500000.0,
     "cash": 109160.0,
-    "market_value": 404500.0,
-    "net_value": 513660.0,
-    "total_return_pct": 2.732,
-    "position_ratio_pct": 78.8,
+    "market_value": 403900.01,
+    "net_value": 513060.01,
+    "total_return_pct": 2.612,
+    "position_ratio_pct": 80.78,
     "positions": [
       {
         "name": "天津发展",
@@ -20,12 +19,12 @@
         "ticker": "0882.HK",
         "shares": 40000,
         "avg_cost": 2.55,
-        "close": 2.48,
-        "change_pct": -2.75,
-        "market_value": 99200.0,
-        "unrealized": -2800.0,
+        "close": 2.42,
+        "change_pct": -2.4194,
+        "market_value": 96800.0,
+        "unrealized": -5200.0,
         "sell_trigger": 4.5,
-        "weight_pct": 19.31,
+        "weight_pct": 18.8672,
         "status": "实时"
       },
       {
@@ -34,12 +33,12 @@
         "ticker": "1522.HK",
         "shares": 342000,
         "avg_cost": 0.295,
-        "close": 0.30,
-        "change_pct": 1.69,
+        "close": 0.3,
+        "change_pct": 0.0,
         "market_value": 102600.0,
         "unrealized": 1710.0,
         "sell_trigger": 0.6,
-        "weight_pct": 19.97,
+        "weight_pct": 19.9977,
         "status": "实时"
       },
       {
@@ -48,12 +47,12 @@
         "ticker": "3320.HK",
         "shares": 15000,
         "avg_cost": 5.33,
-        "close": 6.18,
-        "change_pct": 15.95,
-        "market_value": 92700.0,
-        "unrealized": 12750.0,
+        "close": 6.3,
+        "change_pct": 1.9418,
+        "market_value": 94500.0,
+        "unrealized": 14550.0,
         "sell_trigger": 9.0,
-        "weight_pct": 18.05,
+        "weight_pct": 18.4189,
         "status": "实时"
       },
       {
@@ -63,25 +62,14 @@
         "shares": 250000,
         "avg_cost": 0.432,
         "close": 0.44,
-        "change_pct": 1.85,
+        "change_pct": 0.0,
         "market_value": 110000.0,
         "unrealized": 2000.0,
         "sell_trigger": 1.0,
-        "weight_pct": 21.41,
+        "weight_pct": 21.44,
         "status": "实时"
       }
     ]
   },
-  "today_actions": [],
-  "recent_actions": [
-    {"date": "2026-03-26", "ticker": "1522.HK", "name": "京投交通科技", "action": "INIT_BUY", "price": 0.295, "shares": 342000, "amount": 100890.0, "reason": "初始建仓（3月26日收盘价）"},
-    {"date": "2026-03-26", "ticker": "87001.HK", "name": "汇贤产业信托", "action": "INIT_BUY", "price": 0.432, "shares": 250000, "amount": 108000.0, "reason": "初始建仓（3月26日收盘价）"},
-    {"date": "2026-03-26", "ticker": "0882.HK", "name": "天津发展", "action": "INIT_BUY", "price": 2.55, "shares": 40000, "amount": 102000.0, "reason": "初始建仓（3月26日收盘价）"},
-    {"date": "2026-03-26", "ticker": "3320.HK", "name": "华润医药", "action": "INIT_BUY", "price": 5.33, "shares": 15000, "amount": 79950.0, "reason": "初始建仓（3月26日收盘价）"}
-  ],
-  "summary": {
-    "winners": ["华润医药", "京投交通科技", "汇贤产业信托"],
-    "losers": ["天津发展"],
-    "total_unrealized_pnl": 13660.0
-  }
+  "today_actions": []
 }
