@@ -27,7 +27,8 @@ export default defineConfig({
             { text: '总览', link: '/模拟持仓/' },
             { text: '持仓', link: '/模拟持仓/持仓' },
             { text: '今日操作', link: '/模拟持仓/今日操作' },
-            { text: '决策记录', link: '/模拟持仓/决策记录' }
+            { text: '决策记录', link: '/模拟持仓/决策记录' },
+            { text: '📈 VIX定投策略', link: '/模拟持仓/VIX定投策略' }
           ]
         }
       ],

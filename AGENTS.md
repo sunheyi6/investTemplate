@@ -74,6 +74,21 @@
 grep -q "recent_actions" public/dashboard/dashboard_snapshot.json && echo "OK" || echo "缺少字段!"
 ```
 
+### 4. 更新VIX定投策略数据（⚠️ 极易遗漏网页显示）
+
+**必须同步更新**：
+```
+1️⃣ 08-决策追踪/vix_dca_strategy/daily_snapshot.csv  (每日收益)
+2️⃣ 08-决策追踪/vix_dca_strategy/state.json           (当前状态)
+3️⃣ 模拟持仓/VIX定投策略.md                          (网页展示页面) ⭐易遗漏！
+4️⃣ public/vix_strategy/dashboard_data.json           (网页数据源) ⭐易遗漏！
+```
+
+**更新后验证**：
+- [ ] 数据文件已更新
+- [ ] 网页展示页面数据一致
+- [ ] public目录已同步
+
 详细规范见：[docs/agents/06-模拟组合管理.md](./docs/agents/06-模拟组合管理.md)
 
 ---

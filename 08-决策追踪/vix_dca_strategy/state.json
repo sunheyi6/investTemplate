@@ -1,0 +1,60 @@
+{
+  "strategy": {
+    "name": "VIX定投策略_纳指100",
+    "version": "V1.0",
+    "start_date": "2026-03-26",
+    "etf_code": "513110",
+    "etf_name": "纳斯达克100 ETF",
+    "execution_frequency": "每两周周二执行一次（买入卖出）",
+    "update_frequency": "每日更新收益"
+  },
+  "account": {
+    "initial_capital": 100000,
+    "currency": "CNY",
+    "cash": 90991.00,
+    "last_update": "2026-04-08"
+  },
+  "position": {
+    "shares": 820,
+    "avg_cost": 10.99,
+    "total_cost": 9009.00,
+    "current_price": 11.45,
+    "market_value": 9389.00,
+    "unrealized_pnl": 380.00,
+    "return_pct": 4.22
+  },
+  "daily_performance": {
+    "date": "2026-04-08",
+    "vix": 29.50,
+    "daily_pnl": 139.40,
+    "total_pnl": 380.00,
+    "total_return_pct": 0.38
+  },
+  "statistics": {
+    "cumulative_buy": 9000,
+    "cumulative_sell": 0,
+    "trade_count": 2,
+    "buy_count": 2,
+    "sell_count": 0,
+    "hold_days": 14,
+    "last_trade_date": "2026-04-07",
+    "next_trade_date": "2026-04-21"
+  },
+  "schedule": {
+    "frequency": "每两周周二",
+    "upcoming_trade_dates": [
+      "2026-04-21",
+      "2026-05-05",
+      "2026-05-19",
+      "2026-06-02"
+    ]
+  },
+  "history": {
+    "vix_high": 31.20,
+    "vix_high_date": "2026-04-07",
+    "vix_low": 18.30,
+    "vix_low_date": "2026-04-02",
+    "max_unrealized_pnl": 380.00,
+    "max_unrealized_date": "2026-04-08"
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "strategy_name": "VIX定投策略_纳指100",
+  "version": "V1.0",
+  "start_date": "2026-03-26",
+  "etf_code": "513110",
+  "etf_name": "纳斯达克100 ETF",
+  "description": "基于VIX恐慌指数的定投策略：每两周周二执行，高VIX多买，低VIX减仓",
+  
+  "buy_rules": {
+    "description": "VIX越高，定投金额越大",
+    "tiers": [
+      {
+        "vix_min": 30,
+        "vix_max": 999,
+        "amount": 6000,
+        "label": "加倍定投",
+        "description": "VIX ≥ 30，市场极度恐慌，加倍投入"
+      },
+      {
+        "vix_min": 25,
+        "vix_max": 30,
+        "amount": 4500,
+        "label": "加大定投",
+        "description": "25 ≤ VIX < 30，市场恐慌，加大投入"
+      },
+      {
+        "vix_min": 20,
+        "vix_max": 25,
+        "amount": 3000,
+        "label": "标准定投",
+        "description": "20 ≤ VIX < 25，标准定投金额"
+      },
+      {
+        "vix_min": 0,
+        "vix_max": 20,
+        "amount": 0,
+        "label": "持有不动",
+        "description": "VIX < 20，市场平稳，暂停定投，持有观察"
+      }
+    ]
+  },
+  
+  "sell_rules": {
+    "description": "VIX越低，按比例减仓",
+    "based_on": "total_position_ratio",
+    "tiers": [
+      {
+        "vix_max": 10,
+        "vix_min": 0,
+        "reduce_ratio": 0.25,
+        "label": "大幅减仓",
+        "description": "VIX < 10，市场过度乐观，减仓25%"
+      },
+      {
+        "vix_max": 12,
+        "vix_min": 10,
+        "reduce_ratio": 0.15,
+        "label": "中度减仓",
+        "description": "VIX < 12，减仓15%"
+      },
+      {
+        "vix_max": 15,
+        "vix_min": 12,
+        "reduce_ratio": 0.10,
+        "label": "小幅减仓",
+        "description": "VIX < 15，减仓10%"
+      }
+    ]
+  },
+  
+  "initial_capital": 100000,
+  "currency": "CNY",
+  "execution_frequency": {
+    "type": "biweekly",
+    "day_of_week": "Tuesday",
+    "description": "每两周的周二执行一次定投",
+    "notes": "如遇节假日顺延至下一个交易日"
+  },
+  "execution_notes": [
+    "执行频率：每两周周二执行一次（不是每天）",
+    "严格按VIX档位执行，不主观修改金额和比例",
+    "只针对513110这一只场内ETF",
+    "买卖都以当前实时VIX数值为准",
+    "减仓是按总仓位比例，不是按单笔投入",
+    "每次交易按当日收盘价执行"
+  ]
+}
