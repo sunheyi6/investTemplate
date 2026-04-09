@@ -13,6 +13,7 @@ export default defineConfig({
     nav: [
       { text: '首页', link: '/' },
       { text: '🎯 模拟持仓', link: '/模拟持仓/持仓' },
+      { text: '📈 VIX定投', link: '/模拟持仓/VIX定投策略' },
       { text: '分析模板', link: '/个股分析标准模版' },
       { text: '版本日志', link: '/docs/CHANGELOG' }
     ],

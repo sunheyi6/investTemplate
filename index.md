@@ -15,6 +15,9 @@ hero:
     - theme: brand
       text: 🎯 模拟持仓（实时）
       link: /模拟持仓/持仓
+    - theme: brand
+      text: 📈 VIX定投策略
+      link: /模拟持仓/VIX定投策略
     - theme: alt
       text: 🔍 筛选框架
       link: /template/01-数据核查与地缘政治排除
@@ -41,6 +44,9 @@ features:
   - icon: 🎯
     title: 模拟持仓仪表盘
     details: 单页仪表盘查看真实持仓、今日操作与决策记录，统一数据快照口径
+  - icon: 📈
+    title: VIX定投策略
+    details: 基于恐慌指数的纳指100 ETF定投策略，高VIX多买低VIX减仓，每两周周二执行
   - icon: 🛡️
     title: 严格风控体系
     details: 分级数据源(S-D级)、仓位限制、止损规则、强制性核查清单
@@ -72,6 +78,7 @@ npm run docs:build
 | [docs](/docs/CHANGELOG) | 更新日志与项目结构说明 |
 | [07-分析输出](/07-分析输出/) | 📈 个股投资分析报告归档 + 🔥 每日监控概览 |
 | [🎯 模拟持仓](/模拟持仓/持仓) | 💰 左侧独立导航：持仓 + 今日操作 + 决策记录 |
+| [📈 VIX定投策略](/模拟持仓/VIX定投策略) | 基于VIX指数的纳指100 ETF定投策略 |
 
 ## 核心概念
 
