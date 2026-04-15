@@ -2,16 +2,16 @@
   "meta": {
     "template_version": "V5.5.12",
     "engine_version": "V3.1",
-    "generated_at": "2026-04-14 10:01:58",
-    "latest_trade_date": "2026-04-14"
+    "generated_at": "2026-04-15 10:04:16",
+    "latest_trade_date": "2026-04-15"
   },
   "portfolio": {
     "initial_capital": 500000.0,
     "cash": 109160.0,
-    "market_value": 402270.0,
-    "net_value": 511430.0,
-    "total_return_pct": 2.286,
-    "position_ratio_pct": 80.454,
+    "market_value": 404070.0,
+    "net_value": 513230.0,
+    "total_return_pct": 2.646,
+    "position_ratio_pct": 80.814,
     "positions": [
       {
         "name": "天津发展",
@@ -20,11 +20,11 @@
         "shares": 40000,
         "avg_cost": 2.55,
         "close": 2.41,
-        "change_pct": -0.4132,
+        "change_pct": 0.0,
         "market_value": 96400.0,
         "unrealized": -5600.0,
         "sell_trigger": 4.5,
-        "weight_pct": 18.8491,
+        "weight_pct": 18.783,
         "status": "实时"
       },
       {
@@ -38,7 +38,7 @@
         "market_value": 106020.0,
         "unrealized": 5130.0,
         "sell_trigger": 0.6,
-        "weight_pct": 20.7301,
+        "weight_pct": 20.6574,
         "status": "实时"
       },
       {
@@ -47,12 +47,12 @@
         "ticker": "3320.HK",
         "shares": 15000,
         "avg_cost": 5.33,
-        "close": 6.24,
-        "change_pct": 0.3215,
-        "market_value": 93600.0,
-        "unrealized": 13650.0,
+        "close": 6.36,
+        "change_pct": 1.92,
+        "market_value": 95400.0,
+        "unrealized": 15450.0,
         "sell_trigger": 9.0,
-        "weight_pct": 18.3016,
+        "weight_pct": 18.5882,
         "status": "实时"
       },
       {
@@ -62,11 +62,11 @@
         "shares": 250000,
         "avg_cost": 0.432,
         "close": 0.425,
-        "change_pct": -1.1628,
+        "change_pct": 0.0,
         "market_value": 106250.0,
         "unrealized": -1750.0,
         "sell_trigger": 1.0,
-        "weight_pct": 20.7751,
+        "weight_pct": 20.7022,
         "status": "实时"
       }
     ]
