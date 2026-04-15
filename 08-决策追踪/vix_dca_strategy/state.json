@@ -7,6 +7,7 @@
     "etf_code": "513110",
     "etf_name": "纳斯达克100 ETF",
     "execution_frequency": "每两周周二执行一次（买入卖出）",
+    "execution_anchor_date": "2026-03-24",
     "update_frequency": "每日更新收益"
   },
   "account": {
@@ -32,7 +33,7 @@
     "total_return_pct": 3.83
   },
   "statistics": {
-    "cumulative_buy": 6006,
+    "cumulative_buy": 6000,
     "cumulative_sell": 0,
     "trade_count": 2,
     "buy_count": 2,
@@ -44,6 +45,7 @@
   },
   "schedule": {
     "frequency": "每两周周二",
+    "anchor_date": "2026-03-24",
     "upcoming_trade_dates": [
       "2026-04-21",
       "2026-05-05",

@@ -3,7 +3,7 @@
   "version": "V1.0",
   "last_update": "2026-04-14",
   "account": {
-    "initial_capital": 6006.0,
+    "initial_capital": 6000.0,
     "cash": 93994.0,
     "total_assets": 6236.03
   },
@@ -27,6 +27,7 @@
   },
   "schedule": {
     "frequency": "每两周周二",
+    "anchor_date": "2026-03-24",
     "last_trade_date": "2026-04-07",
     "next_trade_date": "2026-04-21",
     "days_until_next": 7

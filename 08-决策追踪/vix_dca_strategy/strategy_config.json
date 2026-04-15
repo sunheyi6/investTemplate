@@ -73,6 +73,7 @@
   "execution_frequency": {
     "type": "biweekly",
     "day_of_week": "Tuesday",
+    "anchor_date": "2026-03-24",
     "description": "每两周的周二执行一次定投",
     "notes": "如遇节假日顺延至下一个交易日"
   },

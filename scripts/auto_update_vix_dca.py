@@ -207,15 +207,54 @@ def is_trading_day(date_str, last_trade_date, next_trade_date):
     # 必须是周二
     if dt.weekday() != 1:  # 1 = Tuesday
         return False
+
+    # 若已配置next_trade_date，则仅在该日执行交易
+    if next_trade_date:
+        return date_str == next_trade_date
     
-    # 检查是否在预定的交易日列表中
-    # 简单逻辑：距离上次交易日14天
+    # 回退逻辑：距离上次交易日约两周
     if last_trade_date:
         last = datetime.strptime(last_trade_date, '%Y-%m-%d')
         days_diff = (dt - last).days
         return days_diff >= 13  # 约两周
     
     return True
+
+
+def build_upcoming_trade_dates(start_date_str, count=4):
+    """从给定日期开始生成未来双周二日期列表。"""
+    start_dt = datetime.strptime(start_date_str, '%Y-%m-%d')
+    dates = []
+    for i in range(count):
+        dates.append((start_dt + timedelta(days=14 * i)).strftime('%Y-%m-%d'))
+    return dates
+
+
+def ensure_trade_schedule(state, ref_date_str):
+    """确保state中的下次定投日期与日历列表完整且一致。"""
+    stats = state.setdefault('statistics', {})
+    schedule = state.setdefault('schedule', {})
+
+    next_trade = get_next_trade_date(state)
+    if not next_trade:
+        ref_dt = datetime.strptime(ref_date_str, '%Y-%m-%d')
+        days = (1 - ref_dt.weekday()) % 7
+        if days == 0:
+            days = 14
+        next_trade = (ref_dt + timedelta(days=days)).strftime('%Y-%m-%d')
+
+    stats['next_trade_date'] = next_trade
+    schedule['next_trade_date'] = next_trade
+    schedule['upcoming_trade_dates'] = build_upcoming_trade_dates(next_trade, count=4)
+
+
+def roll_next_trade_schedule(state, executed_trade_date):
+    """定投日成交后，滚动到下一次双周二。"""
+    next_trade = (datetime.strptime(executed_trade_date, '%Y-%m-%d') + timedelta(days=14)).strftime('%Y-%m-%d')
+    state.setdefault('statistics', {})['next_trade_date'] = next_trade
+    schedule = state.setdefault('schedule', {})
+    schedule['next_trade_date'] = next_trade
+    schedule['upcoming_trade_dates'] = build_upcoming_trade_dates(next_trade, count=4)
 
 
 def get_next_trade_date(state):
@@ -316,9 +355,12 @@ def update_state(state, config, date_str, vix, price, is_trading):
                 acc['cash'] = cash_after
             
             # 更新统计
-            state['statistics']['cumulative_buy'] += buy_amount
-            state['statistics']['buy_count'] += 1
+            state['statistics']['cumulative_buy'] = float(state['statistics'].get('cumulative_buy', 0) or 0) + buy_amount
+            state['statistics']['buy_count'] = int(state['statistics'].get('buy_count', 0) or 0) + 1
+            state['statistics']['trade_count'] = int(state['statistics'].get('trade_count', 0) or 0) + 1
+            state['statistics']['total_invested'] = float(state['statistics'].get('total_invested', 0) or 0) + buy_amount
             state['statistics']['last_trade_date'] = date_str
+            roll_next_trade_schedule(state, date_str)
             
             trade_executed = True
             trade_info = {
@@ -651,6 +693,7 @@ def main():
     config = load_json(CONFIG_FILE)
     state = load_json(STATE_FILE)
     dashboard = load_json(DASHBOARD_FILE)
+    ensure_trade_schedule(state, date_str)
     
     # 检查是否已更新
     if state.get('account', {}).get('last_update') == date_str and not args.force:

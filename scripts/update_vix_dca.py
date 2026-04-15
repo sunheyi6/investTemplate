@@ -19,6 +19,41 @@ TRADES_FILE = STRATEGY_DIR / "trades.csv"
 SNAPSHOT_FILE = STRATEGY_DIR / "daily_snapshot.csv"
 STATE_FILE = STRATEGY_DIR / "state.json"
 
+def get_next_trade_date(state):
+    schedule = state.get('schedule', {})
+    if schedule.get('next_trade_date'):
+        return schedule['next_trade_date']
+    upcoming = schedule.get('upcoming_trade_dates', [])
+    if isinstance(upcoming, list) and upcoming:
+        return upcoming[0]
+    return state.get('statistics', {}).get('next_trade_date')
+
+
+def build_upcoming_trade_dates(start_date_str, count=4):
+    start_dt = datetime.strptime(start_date_str, '%Y-%m-%d')
+    return [(start_dt + timedelta(days=14 * i)).strftime('%Y-%m-%d') for i in range(count)]
+
+
+def is_trading_day(date_str, state):
+    dt = datetime.strptime(date_str, '%Y-%m-%d')
+    if dt.weekday() != 1:
+        return False
+    next_trade = get_next_trade_date(state)
+    if next_trade:
+        return date_str == next_trade
+    last_trade = state.get('statistics', {}).get('last_trade_date')
+    if last_trade:
+        return (dt - datetime.strptime(last_trade, '%Y-%m-%d')).days >= 13
+    return True
+
+
+def roll_next_trade_schedule(state, executed_trade_date):
+    next_trade = (datetime.strptime(executed_trade_date, '%Y-%m-%d') + timedelta(days=14)).strftime('%Y-%m-%d')
+    state.setdefault('statistics', {})['next_trade_date'] = next_trade
+    schedule = state.setdefault('schedule', {})
+    schedule['next_trade_date'] = next_trade
+    schedule['upcoming_trade_dates'] = build_upcoming_trade_dates(next_trade, count=4)
+
 
 def main():
     parser = argparse.ArgumentParser(description='VIX定投策略更新')
@@ -37,8 +72,7 @@ def main():
     vix, price, date = args.vix, args.price, args.date
     
     # 判断是否为定投日
-    dt = datetime.strptime(date, '%Y-%m-%d')
-    is_trading = (dt.weekday() == 1 and date in ['2026-04-07', '2026-04-21', '2026-05-05', '2026-05-19'])
+    is_trading = is_trading_day(date, state)
     reason = "定投日" if is_trading else "非定投日"
     
     print(f"=== VIX定投策略更新 ({date}) ===")
@@ -77,8 +111,12 @@ def main():
             state['position']['total_cost'] += total_cost
             state['position']['avg_cost'] = state['position']['total_cost'] / state['position']['shares']
             state['account']['cash'] = cash_after
-            state['statistics']['cumulative_buy'] += buy_amount
-            state['statistics']['buy_count'] += 1
+            state['statistics']['cumulative_buy'] = float(state['statistics'].get('cumulative_buy', 0) or 0) + buy_amount
+            state['statistics']['buy_count'] = int(state['statistics'].get('buy_count', 0) or 0) + 1
+            state['statistics']['trade_count'] = int(state['statistics'].get('trade_count', 0) or 0) + 1
+            state['statistics']['total_invested'] = float(state['statistics'].get('total_invested', 0) or 0) + buy_amount
+            state['statistics']['last_trade_date'] = date
+            roll_next_trade_schedule(state, date)
             
             # 记录交易
             if not args.dry_run:
