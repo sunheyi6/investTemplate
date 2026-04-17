@@ -513,6 +513,7 @@ def update_markdown_template(state, date_str, vix, price):
     upcoming_trades = schedule.get('upcoming_trade_dates', [])
     if not upcoming_trades and next_trade:
         upcoming_trades = [next_trade]
+    anchor_date = schedule.get('anchor_date', '未设置')
     
     content = f"""# VIX定投策略 - 纳指100 ETF（**{ETF_CODE}**）
 
