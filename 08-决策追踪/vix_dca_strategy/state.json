@@ -41,18 +41,19 @@
     "total_invested": 6000,
     "hold_days": 14,
     "last_trade_date": "2026-04-07",
-    "next_trade_date": "2026-04-21"
+    "next_trade_date": "2026-05-05"
   },
   "schedule": {
     "frequency": "每两周周二",
     "anchor_date": "2026-03-24",
     "upcoming_trade_dates": [
-      "2026-04-21",
       "2026-05-05",
       "2026-05-19",
-      "2026-06-02"
+      "2026-06-02",
+      "2026-06-16",
+      "2026-06-30"
     ],
-    "next_trade_date": "2026-04-21"
+    "next_trade_date": "2026-05-05"
   },
   "history": {
     "vix_high": 21.23,

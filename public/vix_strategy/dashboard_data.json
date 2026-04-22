@@ -28,8 +28,8 @@
   "schedule": {
     "frequency": "每两周周二",
     "last_trade_date": "2026-04-07",
-    "next_trade_date": "2026-04-21",
-    "days_until_next": -1
+    "next_trade_date": "2026-05-05",
+    "days_until_next": 13
   },
   "recent_trades": [
     {
@@ -75,48 +75,6 @@
       "price": 2.026,
       "pnl": 230.03,
       "daily_pnl": 0.0
-    },
-    {
-      "date": "2026-04-15",
-      "price": 2.026,
-      "pnl": 230.03,
-      "daily_pnl": 0.0
-    },
-    {
-      "date": "2026-04-14",
-      "price": 2.026,
-      "pnl": 230.03,
-      "daily_pnl": 0.0
-    },
-    {
-      "date": "2026-04-13",
-      "price": 2.026,
-      "pnl": 230.03,
-      "daily_pnl": 0.0
-    },
-    {
-      "date": "2026-04-10",
-      "price": 2.026,
-      "pnl": 230.03,
-      "daily_pnl": 0.4
-    },
-    {
-      "date": "2026-04-09",
-      "price": 2.026,
-      "pnl": 229.63,
-      "daily_pnl": 227.37
-    },
-    {
-      "date": "2026-04-07",
-      "price": 1.952,
-      "pnl": 2.26,
-      "daily_pnl": 5.03
-    },
-    {
-      "date": "2026-03-24",
-      "price": 1.947,
-      "pnl": -2.77,
-      "daily_pnl": -2.77
     }
   ]
 }
