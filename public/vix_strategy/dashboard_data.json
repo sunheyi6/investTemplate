@@ -5,24 +5,24 @@
   "account": {
     "initial_capital": 6000.0,
     "cash": 93994.0,
-    "total_assets": 6759.29
+    "total_assets": 7319.48
   },
   "position": {
     "etf_code": "513110",
     "etf_name": "纳斯达克100 ETF",
     "shares": 3078,
     "avg_cost": 1.95,
-    "current_price": 2.196,
-    "market_value": 6759.29,
+    "current_price": 2.378,
+    "market_value": 7319.48,
     "total_cost": 6006.0,
-    "unrealized_pnl": 753.29,
-    "return_pct": 12.54
+    "unrealized_pnl": 1313.48,
+    "return_pct": 21.87
   },
   "performance": {
-    "total_pnl": 753.29,
-    "total_return_pct": 12.65,
-    "daily_pnl": 0.0,
-    "vix": 18.24,
+    "total_pnl": 1313.48,
+    "total_return_pct": 21.99,
+    "daily_pnl": 560.2,
+    "vix": 18.28,
     "date": "2026-05-11"
   },
   "schedule": {
@@ -54,9 +54,9 @@
   "daily_snapshots": [
     {
       "date": "2026-05-11",
-      "price": 2.196,
-      "pnl": 753.29,
-      "daily_pnl": 0.0
+      "price": 2.378,
+      "pnl": 1313.48,
+      "daily_pnl": 560.2
     },
     {
       "date": "2026-05-01",

@@ -20,17 +20,17 @@
     "shares": 3078,
     "avg_cost": 1.95,
     "total_cost": 6006.0,
-    "current_price": 2.196,
-    "market_value": 6759.2880000000005,
-    "unrealized_pnl": 753.2880000000005,
-    "return_pct": 12.54
+    "current_price": 2.378,
+    "market_value": 7319.484,
+    "unrealized_pnl": 1313.4840000000004,
+    "return_pct": 21.87
   },
   "daily_performance": {
     "date": "2026-05-11",
-    "vix": 18.24,
-    "daily_pnl": 0.0,
-    "total_pnl": 753.29,
-    "total_return_pct": 12.65
+    "vix": 18.28,
+    "daily_pnl": 560.2,
+    "total_pnl": 1313.48,
+    "total_return_pct": 21.99
   },
   "statistics": {
     "cumulative_buy": 6000,
@@ -60,8 +60,8 @@
     "vix_high_date": "2026-04-13",
     "vix_low": 17.1,
     "vix_low_date": "2026-05-01",
-    "max_unrealized_pnl": 756.366,
-    "max_unrealized_date": "2026-04-28"
+    "max_unrealized_pnl": 1313.4840000000004,
+    "max_unrealized_date": "2026-05-11"
   },
   "strategy_state": {
     "biweekly_vix_log": [],
