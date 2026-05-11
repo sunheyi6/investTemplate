@@ -887,7 +887,7 @@ def update_dashboard_data(dashboard, state, date_str, vix, price, trade_infos):
 
 def update_markdown_template(state, date_str, vix, price):
     """更新Markdown展示文件"""
-    template_path = TEMPLATE_DIR / "VIX定投策略.md"
+    template_path = TEMPLATE_DIR / "vix-dca-strategy.md"
     pos = state['position']
     acc = state['account']
     perf = state['daily_performance']
