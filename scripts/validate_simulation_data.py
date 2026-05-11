@@ -25,8 +25,8 @@ from typing import Dict, List
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
-STATE_FILE = ROOT / "08-决策追踪" / "simulation_state.json"
-TRADES_FILE = ROOT / "08-决策追踪" / "simulation_trades.csv"
+STATE_FILE = ROOT / "decision-tracking" / "simulation_state.json"
+TRADES_FILE = ROOT / "decision-tracking" / "simulation_trades.csv"
 
 INITIAL_CAPITAL = 500000.0
 

@@ -8,12 +8,12 @@ import os
 os.chdir(r'D:\product\investTemplate')
 
 # 加载state
-with open('08-决策追踪/simulation_state.json', 'r', encoding='utf-8') as f:
+with open('decision-tracking/simulation_state.json', 'r', encoding='utf-8') as f:
     state = json.load(f)
 
 # 加载trades
 trades = []
-with open('08-决策追踪/simulation_trades.csv', 'r', encoding='utf-8') as f:
+with open('decision-tracking/simulation_trades.csv', 'r', encoding='utf-8') as f:
     reader = csv.DictReader(f)
     for row in reader:
         trades.append(row)
@@ -21,7 +21,7 @@ with open('08-决策追踪/simulation_trades.csv', 'r', encoding='utf-8') as f:
 # 加载snapshot
 snapshots = []
 try:
-    with open('08-决策追踪/simulation_daily_snapshot.csv', 'r', encoding='utf-8') as f:
+    with open('decision-tracking/simulation_daily_snapshot.csv', 'r', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         for row in reader:
             snapshots.append(row)

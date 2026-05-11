@@ -3,7 +3,7 @@
 生成每日监控概览
 
 功能：
-1. 扫描 07-分析输出/*_投资分析报告.md
+1. 扫描 analysis-reports/*_投资分析报告.md
 2. 提取目标买点、一句话结论
 3. 抓取当前股价（港股+A股，使用 yfinance）
 4. 生成监控概览报告
@@ -15,8 +15,8 @@ from pathlib import Path
 from datetime import datetime
 
 ROOT = Path(__file__).resolve().parents[1]
-REPORT_DIR = ROOT / "07-分析输出"
-OUTPUT_FILE = ROOT / "07-分析输出" / "监控概览.md"
+REPORT_DIR = ROOT / "analysis-reports"
+OUTPUT_FILE = ROOT / "analysis-reports" / "监控概览.md"
 
 
 def extract_stock_info(report_path):

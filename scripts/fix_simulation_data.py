@@ -67,7 +67,7 @@ print('  累计投入: {:,.2f}'.format(total_spent))
 print('  剩余现金: {:,.2f}'.format(cash_remaining))
 
 # 写入 trades.csv
-with open('08-决策追踪/simulation_trades.csv', 'w', newline='', encoding='utf-8') as f:
+with open('decision-tracking/simulation_trades.csv', 'w', newline='', encoding='utf-8') as f:
     writer = csv.DictWriter(f, fieldnames=['date', 'ticker', 'name', 'code', 'action', 'price', 'shares', 'amount', 'cash_after', 'reason'])
     writer.writeheader()
     writer.writerows(trades)
@@ -131,7 +131,7 @@ state = {
     'positions': positions
 }
 
-with open('08-决策追踪/simulation_state.json', 'w', encoding='utf-8') as f:
+with open('decision-tracking/simulation_state.json', 'w', encoding='utf-8') as f:
     json.dump(state, f, indent=2, ensure_ascii=False)
 print('  [OK] state.json 已更新')
 print()
@@ -168,7 +168,7 @@ for ticker, config in POSITIONS_CONFIG.items():
         'total_return_pct': 0.0
     })
 
-with open('08-决策追踪/simulation_daily_snapshot.csv', 'w', newline='', encoding='utf-8') as f:
+with open('decision-tracking/simulation_daily_snapshot.csv', 'w', newline='', encoding='utf-8') as f:
     fieldnames = ['date', 'ticker', 'name', 'code', 'close', 'prev_close', 'change_pct', 
                   'shares', 'avg_cost', 'action', 'action_shares', 'action_price', 
                   'action_amount', 'market_value', 'unrealized_pnl', 'cash_after', 

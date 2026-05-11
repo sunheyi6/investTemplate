@@ -53,12 +53,12 @@
 |------|------|
 | `scripts/auto_update_vix_dca.py` | 自动更新脚本 V2.0 |
 | `.github/workflows/vix_dca_daily_update.yml` | GitHub Actions工作流 |
-| `08-决策追踪/vix_dca_strategy/strategy_config.json` | 策略配置（档位、修正、风控参数） |
-| `08-决策追踪/vix_dca_strategy/state.json` | 策略状态数据 |
-| `08-决策追踪/vix_dca_strategy/dashboard_data.json` | 仪表板数据 |
-| `08-决策追踪/vix_dca_strategy/daily_snapshot.csv` | 每日快照记录 |
-| `08-决策追踪/vix_dca_strategy/trades.csv` | 交易记录 |
-| `模拟持仓/VIX定投策略.md` | 网页展示文档 |
+| `decision-tracking/vix_dca_strategy/strategy_config.json` | 策略配置（档位、修正、风控参数） |
+| `decision-tracking/vix_dca_strategy/state.json` | 策略状态数据 |
+| `decision-tracking/vix_dca_strategy/dashboard_data.json` | 仪表板数据 |
+| `decision-tracking/vix_dca_strategy/daily_snapshot.csv` | 每日快照记录 |
+| `decision-tracking/vix_dca_strategy/trades.csv` | 交易记录 |
+| `portfolio/VIX定投策略.md` | 网页展示文档 |
 | `public/vix_strategy/dashboard_data.json` | 网页数据源 |
 
 ---

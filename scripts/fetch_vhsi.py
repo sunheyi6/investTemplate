@@ -9,7 +9,7 @@ import json
 import os
 
 VHSI_SYMBOL = "^VHSI"  # Yahoo Finance 代码
-OUTPUT_FILE = "08-决策追踪/vhsi_monitoring.json"
+OUTPUT_FILE = "decision-tracking/vhsi_monitoring.json"
 
 
 def fetch_vhsi():

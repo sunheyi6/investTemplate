@@ -35,8 +35,8 @@ except ImportError:
 
 
 ROOT = Path(__file__).resolve().parents[1]
-REPORT_POOL_DIR = ROOT / "07-分析输出"
-TRACK_DIR = ROOT / "08-决策追踪"
+REPORT_POOL_DIR = ROOT / "analysis-reports"
+TRACK_DIR = ROOT / "decision-tracking"
 PUBLIC_DIR = ROOT / "public" / "dashboard"
 STATE_FILE = TRACK_DIR / "simulation_state.json"
 TRADES_FILE = TRACK_DIR / "simulation_trades.csv"

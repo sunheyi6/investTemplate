@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-STRATEGY_DIR = ROOT / "08-决策追踪" / "vix_dca_strategy"
+STRATEGY_DIR = ROOT / "decision-tracking" / "vix_dca_strategy"
 
 CONFIG_FILE = STRATEGY_DIR / "strategy_config.json"
 TRADES_FILE = STRATEGY_DIR / "trades.csv"
