@@ -89,7 +89,8 @@ export default defineConfig({
           { text: '牧原股份_002714_投资分析报告', link: '/analysis-reports/牧原股份_002714_投资分析报告' },
           { text: '分众传媒_002027_投资分析报告', link: '/analysis-reports/分众传媒_002027_投资分析报告' },
           { text: '青岛啤酒_600600_投资分析报告', link: '/analysis-reports/青岛啤酒_600600_投资分析报告' },
-          { text: '华润医药_03320_投资分析报告', link: '/analysis-reports/华润医药_03320_投资分析报告' }
+          { text: '华润医药_03320_投资分析报告', link: '/analysis-reports/华润医药_03320_投资分析报告' },
+          { text: '中国食品_00506_投资分析报告', link: '/analysis-reports/中国食品_00506_投资分析报告' }
         ]
       }
       ]
