@@ -8,6 +8,9 @@ export default defineConfig({
   // 忽略的死链（有些文件可能临时不存在）
   ignoreDeadLinks: true,
   
+  // 排除不需要构建的目录
+  srcExclude: ['tmp/**'],
+  
   themeConfig: {
     // 导航栏
     nav: [
