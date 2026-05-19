@@ -14,46 +14,46 @@
     "initial_capital": 100000,
     "currency": "CNY",
     "cash": 93994.0,
-    "last_update": "2026-05-18"
+    "last_update": "2026-05-19"
   },
   "position": {
-    "shares": 3078,
-    "avg_cost": 1.95,
-    "total_cost": 6006.0,
-    "current_price": 2.312,
-    "market_value": 7116.335999999999,
-    "unrealized_pnl": 1110.3359999999993,
-    "return_pct": 18.49
+    "shares": 3728,
+    "avg_cost": 2.013157188841202,
+    "total_cost": 7505.05,
+    "current_price": 2.306,
+    "market_value": 8596.768,
+    "unrealized_pnl": 1091.7179999999998,
+    "return_pct": 14.55
   },
   "daily_performance": {
-    "date": "2026-05-18",
-    "vix": 19.23,
-    "daily_pnl": -181.6,
-    "total_pnl": 1110.34,
-    "total_return_pct": 18.61
+    "date": "2026-05-19",
+    "vix": 18.15,
+    "daily_pnl": -18.62,
+    "total_pnl": 1091.72,
+    "total_return_pct": 14.62
   },
   "statistics": {
-    "cumulative_buy": 6000,
+    "cumulative_buy": 7500.0,
     "cumulative_sell": 0,
-    "trade_count": 2,
-    "buy_count": 2,
+    "trade_count": 3,
+    "buy_count": 3,
     "sell_count": 0,
-    "total_invested": 6000,
+    "total_invested": 7500.0,
     "hold_days": 14,
-    "last_trade_date": "2026-04-07",
-    "next_trade_date": "2026-05-19"
+    "last_trade_date": "2026-05-19",
+    "next_trade_date": "2026-06-02"
   },
   "schedule": {
     "frequency": "每两周周二",
     "anchor_date": "2026-03-24",
     "upcoming_trade_dates": [
-      "2026-05-19",
       "2026-06-02",
       "2026-06-16",
       "2026-06-30",
-      "2026-07-14"
+      "2026-07-14",
+      "2026-07-28"
     ],
-    "next_trade_date": "2026-05-19"
+    "next_trade_date": "2026-06-02"
   },
   "history": {
     "vix_high": 21.23,
@@ -64,7 +64,12 @@
     "max_unrealized_date": "2026-05-11"
   },
   "strategy_state": {
-    "biweekly_vix_log": [],
+    "biweekly_vix_log": [
+      {
+        "date": "2026-05-19",
+        "vix": 18.15
+      }
+    ],
     "cumulative_sell_ratio": 0.0,
     "reduction_pool": {
       "total_cash": 0.0,
