@@ -7,11 +7,16 @@
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f8fafc; padding: 20px; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f8fafc; padding: 16px; }
   .chart-container { width: 100%; max-width: 960px; margin: 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 20px; }
-  .chart-title { font-size: 18px; font-weight: 600; color: #1f2937; text-align: center; margin-bottom: 16px; }
-  .chart-subtitle { font-size: 12px; color: #9ca3af; text-align: center; margin-bottom: 8px; }
-  #chart { width: 100%; height: 420px; }
+  .chart-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; }
+  .chart-title { font-size: 18px; font-weight: 600; color: #1f2937; }
+  .period-tabs { display: flex; gap: 4px; background: #f3f4f6; border-radius: 6px; padding: 3px; }
+  .period-tab { padding: 5px 14px; border: none; background: transparent; color: #6b7280; font-size: 12px; font-weight: 500; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
+  .period-tab:hover { color: #374151; }
+  .period-tab.active { background: #fff; color: #1f2937; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+  .chart-subtitle { font-size: 12px; color: #9ca3af; margin-bottom: 8px; }
+  #chart { width: 100%; height: 400px; }
   .stats-bar { display: flex; justify-content: center; gap: 24px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb; flex-wrap: wrap; }
   .stat-item { text-align: center; }
   .stat-label { font-size: 11px; color: #6b7280; }
@@ -22,8 +27,16 @@
 </head>
 <body>
 <div class="chart-container">
-  <div class="chart-title">VIX定投策略 — 累计收益率曲线</div>
-  <div class="chart-subtitle">鼠标悬停查看每日详细数据 | 最后更新: 2026-05-19</div>
+  <div class="chart-header">
+    <div class="chart-title">VIX定投策略 — 累计收益率曲线</div>
+    <div class="period-tabs">
+      <button class="period-tab active" data-period="day" onclick="switchPeriod('day')">日</button>
+      <button class="period-tab" data-period="week" onclick="switchPeriod('week')">周</button>
+      <button class="period-tab" data-period="month" onclick="switchPeriod('month')">月</button>
+      <button class="period-tab" data-period="year" onclick="switchPeriod('year')">年</button>
+    </div>
+  </div>
+  <div class="chart-subtitle">鼠标悬停查看详细数据 | 最后更新: 2026-05-19</div>
   <div id="chart"></div>
   <div class="stats-bar">
     <div class="stat-item">
@@ -49,93 +62,157 @@
   </div>
 </div>
 <script>
+  var rawData = [{"date": "2026-03-24", "total_return_pct": -0.09, "daily_pnl": -2.77, "price": 1.947, "vix": 21.0, "market_value": 3000.23, "unrealized_pnl": -2.77}, {"date": "2026-04-07", "total_return_pct": 0.04, "daily_pnl": 5.03, "price": 1.952, "vix": 19.5, "market_value": 6008.26, "unrealized_pnl": 2.26}, {"date": "2026-04-09", "total_return_pct": 3.82, "daily_pnl": 227.37, "price": 2.026, "vix": 21.22, "market_value": 6235.63, "unrealized_pnl": 229.63}, {"date": "2026-04-22", "total_return_pct": 9.31, "daily_pnl": 0.0, "price": 2.133, "vix": 19.26, "market_value": 6565.37, "unrealized_pnl": 559.37}, {"date": "2026-04-29", "total_return_pct": 9.72, "daily_pnl": -27.7, "price": 2.188, "vix": null, "market_value": 0.0, "unrealized_pnl": 728.66}, {"date": "2026-04-30", "total_return_pct": 10.04, "daily_pnl": 24.62, "price": 2.196, "vix": null, "market_value": 0.0, "unrealized_pnl": 753.29}, {"date": "2026-05-01", "total_return_pct": 10.04, "daily_pnl": 0.0, "price": 2.196, "vix": null, "market_value": 0.0, "unrealized_pnl": 753.29}, {"date": "2026-05-11", "total_return_pct": 17.51, "daily_pnl": 560.2, "price": 2.378, "vix": null, "market_value": 0.0, "unrealized_pnl": 1313.48}, {"date": "2026-05-12", "total_return_pct": 17.51, "daily_pnl": 0.0, "price": 2.378, "vix": null, "market_value": 0.0, "unrealized_pnl": 1313.48}, {"date": "2026-05-13", "total_return_pct": 17.51, "daily_pnl": 0.0, "price": 2.378, "vix": null, "market_value": 0.0, "unrealized_pnl": 1313.48}, {"date": "2026-05-14", "total_return_pct": 17.23, "daily_pnl": -21.55, "price": 2.371, "vix": null, "market_value": 0.0, "unrealized_pnl": 1291.94}, {"date": "2026-05-15", "total_return_pct": 17.23, "daily_pnl": 0.0, "price": 2.371, "vix": null, "market_value": 0.0, "unrealized_pnl": 1291.94}, {"date": "2026-05-18", "total_return_pct": 14.8, "daily_pnl": -181.6, "price": 2.312, "vix": null, "market_value": 0.0, "unrealized_pnl": 1110.34}, {"date": "2026-05-19", "total_return_pct": 14.62, "daily_pnl": 0.0, "price": 2.306, "vix": 18.15, "market_value": 8596.77, "unrealized_pnl": 1091.72}];
   var chart = echarts.init(document.getElementById('chart'));
-  var dates = ["2026-03-24", "2026-04-07", "2026-04-09", "2026-04-22", "2026-05-19"];
-  var totalReturns = [-0.09, 0.04, 3.82, 9.31, 14.62];
-  var dailyPnls = [-2.77, 5.03, 227.37, 0.0, 0.0];
-  var prices = [1.947, 1.952, 2.026, 2.133, 2.306];
-  var vixs = [21.0, 19.5, 21.22, 19.26, 18.15];
-  var marketValues = [3000.23, 6008.26, 6235.63, 6565.37, 8596.77];
-  var unrealizedPnls = [-2.77, 2.26, 229.63, 559.37, 1091.72];
+  var currentPeriod = 'day';
 
-  var option = {
-    tooltip: {
-      trigger: 'axis',
-      backgroundColor: 'rgba(255,255,255,0.95)',
-      borderColor: '#e5e7eb',
-      borderWidth: 1,
-      textStyle: { color: '#1f2937', fontSize: 12 },
-      formatter: function(params) {
-        var idx = params[0].dataIndex;
-        var color = totalReturns[idx] >= 0 ? '#16a34a' : '#dc2626';
-        return '<div style="font-weight:600;margin-bottom:6px;">' + dates[idx] + '</div>' +
-          '<div style="display:grid;grid-template-columns:auto auto;gap:4px 16px;">' +
-          '<span style="color:#6b7280;">累计收益率:</span> <span style="font-weight:600;color:' + color + '">' + (totalReturns[idx] >= 0 ? '+' : '') + totalReturns[idx].toFixed(2) + '%</span>' +
-          '<span style="color:#6b7280;">当日盈亏:</span> <span style="font-weight:600;">' + (dailyPnls[idx] >= 0 ? '+' : '') + dailyPnls[idx].toFixed(2) + '元</span>' +
-          '<span style="color:#6b7280;">ETF价格:</span> <span style="font-weight:600;">' + prices[idx].toFixed(3) + '元</span>' +
-          '<span style="color:#6b7280;">VIX:</span> <span style="font-weight:600;">' + vixs[idx].toFixed(2) + '</span>' +
-          '<span style="color:#6b7280;">持仓市值:</span> <span style="font-weight:600;">' + marketValues[idx].toLocaleString('zh-CN', {minimumFractionDigits:2}) + '元</span>' +
-          '<span style="color:#6b7280;">浮动盈亏:</span> <span style="font-weight:600;color:' + color + '">' + (unrealizedPnls[idx] >= 0 ? '+' : '') + unrealizedPnls[idx].toFixed(2) + '元</span>' +
-          '</div>';
-      }
-    },
-    grid: { left: '3%', right: '4%', bottom: '3%', top: '8%', containLabel: true },
-    xAxis: {
-      type: 'category',
-      boundaryGap: false,
-      data: dates,
-      axisLine: { lineStyle: { color: '#e5e7eb' } },
-      axisLabel: { color: '#6b7280', fontSize: 10, rotate: 30 },
-      axisTick: { show: false }
-    },
-    yAxis: {
-      type: 'value',
-      axisLabel: { formatter: '{value}%', color: '#6b7280', fontSize: 11 },
-      axisLine: { show: false },
-      splitLine: { lineStyle: { color: '#f3f4f6', type: 'dashed' } },
-      scale: true
-    },
-    series: [
-      {
-        name: '累计收益率',
-        type: 'line',
-        smooth: 0.3,
-        symbol: 'circle',
-        symbolSize: 6,
-        showSymbol: false,
-        lineStyle: { width: 3, color: '#16a34a' },
-        itemStyle: { color: '#16a34a', borderWidth: 2, borderColor: '#fff' },
-        areaStyle: {
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(22, 163, 74, 0.2)' },
-            { offset: 1, color: 'rgba(22, 163, 74, 0.02)' }
-          ])
-        },
-        data: totalReturns,
-        markLine: {
-          silent: true,
-          symbol: 'none',
-          lineStyle: { color: '#9ca3af', type: 'solid', width: 1 },
-          data: [{ yAxis: 0 }],
-          label: { show: false }
-        }
-      }
-    ],
-    animationDuration: 800,
-    animationEasing: 'cubicOut'
-  };
-
-  // 根据最终收益率颜色调整
-  if (totalReturns[totalReturns.length - 1] < 0) {
-    option.series[0].lineStyle.color = '#dc2626';
-    option.series[0].itemStyle.color = '#dc2626';
-    option.series[0].areaStyle.color = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-      { offset: 0, color: 'rgba(220, 38, 38, 0.2)' },
-      { offset: 1, color: 'rgba(220, 38, 38, 0.02)' }
-    ]);
+  function getWeekKey(dateStr) {
+    var d = new Date(dateStr);
+    var day = d.getDay();
+    var diff = d.getDate() - day + (day === 0 ? -6 : 1);
+    var monday = new Date(d.setDate(diff));
+    return monday.getFullYear() + '-W' + String(Math.ceil((d.getDate())/7)).padStart(2,'0');
   }
 
-  chart.setOption(option);
+  function getYearWeek(dateStr) {
+    var d = new Date(dateStr);
+    d.setHours(0,0,0,0);
+    d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+    var yearStart = new Date(d.getFullYear(), 0, 1);
+    var weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    return d.getFullYear() + '-W' + String(weekNo).padStart(2, '0');
+  }
+
+  function aggregateData(period) {
+    if (period === 'day') return rawData;
+
+    var groups = {};
+    for (var i = 0; i < rawData.length; i++) {
+      var item = rawData[i];
+      var d = new Date(item.date);
+      var key;
+      if (period === 'week') {
+        key = getYearWeek(item.date);
+      } else if (period === 'month') {
+        key = item.date.substring(0, 7);
+      } else if (period === 'year') {
+        key = item.date.substring(0, 4);
+      }
+      // 始终取该组最后一个数据（最新数据）
+      groups[key] = item;
+    }
+
+    var result = [];
+    var sortedKeys = Object.keys(groups).sort();
+    for (var k = 0; k < sortedKeys.length; k++) {
+      result.push(groups[sortedKeys[k]]);
+    }
+    return result;
+  }
+
+  function getPeriodLabel(period) {
+    if (period === 'day') return '日';
+    if (period === 'week') return '周';
+    if (period === 'month') return '月';
+    if (period === 'year') return '年';
+    return period;
+  }
+
+  function renderChart(period) {
+    var data = aggregateData(period);
+    var dates = data.map(function(d) { return d.date; });
+    var totalReturns = data.map(function(d) { return d.total_return_pct; });
+    var dailyPnls = data.map(function(d) { return d.daily_pnl; });
+    var prices = data.map(function(d) { return d.price; });
+    var vixs = data.map(function(d) { return d.vix; });
+    var marketValues = data.map(function(d) { return d.market_value; });
+    var unrealizedPnls = data.map(function(d) { return d.unrealized_pnl; });
+
+    var color = totalReturns[totalReturns.length - 1] >= 0 ? '#16a34a' : '#dc2626';
+    var areaColorStart = totalReturns[totalReturns.length - 1] >= 0 ? 'rgba(22, 163, 74, 0.2)' : 'rgba(220, 38, 38, 0.2)';
+    var areaColorEnd = totalReturns[totalReturns.length - 1] >= 0 ? 'rgba(22, 163, 74, 0.02)' : 'rgba(220, 38, 38, 0.02)';
+
+    var option = {
+      tooltip: {
+        trigger: 'axis',
+        backgroundColor: 'rgba(255,255,255,0.95)',
+        borderColor: '#e5e7eb',
+        borderWidth: 1,
+        textStyle: { color: '#1f2937', fontSize: 12 },
+        formatter: function(params) {
+          var idx = params[0].dataIndex;
+          var c = totalReturns[idx] >= 0 ? '#16a34a' : '#dc2626';
+          var vixStr = vixs[idx] !== null && vixs[idx] !== undefined ? vixs[idx].toFixed(2) : '—';
+          var mvStr = marketValues[idx] ? marketValues[idx].toLocaleString('zh-CN', {minimumFractionDigits:2}) : '—';
+          return '<div style="font-weight:600;margin-bottom:6px;">' + dates[idx] + '</div>' +
+            '<div style="display:grid;grid-template-columns:auto auto;gap:4px 16px;">' +
+            '<span style="color:#6b7280;">累计收益率:</span> <span style="font-weight:600;color:' + c + '">' + (totalReturns[idx] >= 0 ? '+' : '') + totalReturns[idx].toFixed(2) + '%</span>' +
+            '<span style="color:#6b7280;">当日盈亏:</span> <span style="font-weight:600;">' + (dailyPnls[idx] >= 0 ? '+' : '') + dailyPnls[idx].toFixed(2) + '元</span>' +
+            '<span style="color:#6b7280;">ETF价格:</span> <span style="font-weight:600;">' + (prices[idx] ? prices[idx].toFixed(3) : '—') + '元</span>' +
+            '<span style="color:#6b7280;">VIX:</span> <span style="font-weight:600;">' + vixStr + '</span>' +
+            '<span style="color:#6b7280;">持仓市值:</span> <span style="font-weight:600;">' + mvStr + '元</span>' +
+            '<span style="color:#6b7280;">浮动盈亏:</span> <span style="font-weight:600;color:' + c + '">' + (unrealizedPnls[idx] >= 0 ? '+' : '') + unrealizedPnls[idx].toFixed(2) + '元</span>' +
+            '</div>';
+        }
+      },
+      grid: { left: '3%', right: '4%', bottom: '3%', top: '10%', containLabel: true },
+      xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: dates,
+        axisLine: { lineStyle: { color: '#e5e7eb' } },
+        axisLabel: { color: '#6b7280', fontSize: 10, rotate: period === 'day' ? 30 : 0 },
+        axisTick: { show: false }
+      },
+      yAxis: {
+        type: 'value',
+        axisLabel: { formatter: '{value}%', color: '#6b7280', fontSize: 11 },
+        axisLine: { show: false },
+        splitLine: { lineStyle: { color: '#f3f4f6', type: 'dashed' } },
+        scale: true
+      },
+      series: [
+        {
+          name: '累计收益率',
+          type: 'line',
+          smooth: 0.3,
+          symbol: 'circle',
+          symbolSize: period === 'day' ? 4 : 7,
+          showSymbol: period !== 'day',
+          lineStyle: { width: 3, color: color },
+          itemStyle: { color: color, borderWidth: 2, borderColor: '#fff' },
+          areaStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: areaColorStart },
+              { offset: 1, color: areaColorEnd }
+            ])
+          },
+          data: totalReturns,
+          markLine: {
+            silent: true,
+            symbol: 'none',
+            lineStyle: { color: '#9ca3af', type: 'solid', width: 1 },
+            data: [{ yAxis: 0 }],
+            label: { show: false }
+          }
+        }
+      ],
+      animationDuration: 500,
+      animationEasing: 'cubicOut'
+    };
+
+    chart.setOption(option, true);
+  }
+
+  function switchPeriod(period) {
+    currentPeriod = period;
+    document.querySelectorAll('.period-tab').forEach(function(btn) {
+      btn.classList.toggle('active', btn.dataset.period === period);
+    });
+    renderChart(period);
+  }
+
+  renderChart('day');
   window.addEventListener('resize', function() { chart.resize(); });
 </script>
 </body>

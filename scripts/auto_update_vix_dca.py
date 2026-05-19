@@ -1192,14 +1192,41 @@ def generate_returns_curve_svg(output_path, data_rows):
     print(f"[图表] 已生成收益率曲线SVG: {output_path}")
 
 
+def get_tracking_principal_from_state():
+    """从state或dashboard获取跟踪本金"""
+    try:
+        dashboard = load_json(DASHBOARD_FILE)
+        principal = float(dashboard.get('account', {}).get('initial_capital', 0))
+        if principal > 0:
+            return principal
+    except Exception:
+        pass
+    try:
+        state = load_json(STATE_FILE)
+        principal = float(state.get('account', {}).get('initial_capital', 0))
+        if principal > 0:
+            return principal
+        cumulative_buy = float(state.get('statistics', {}).get('cumulative_buy', 0))
+        if cumulative_buy > 0:
+            return cumulative_buy
+        total_cost = float(state.get('position', {}).get('total_cost', 0))
+        if total_cost > 0:
+            return total_cost
+    except Exception:
+        pass
+    return 7500.0  # 默认值
+
+
 def load_daily_returns_full():
-    """加载完整的每日收益率数据（包含所有字段用于tooltip）"""
-    rows = []
+    """加载完整的每日收益率数据，合并 daily_returns.csv + dashboard_data.json daily_snapshots"""
+    rows_by_date = {}
+
+    # 1. 从 daily_returns.csv 读取（优先级最高）
     if DAILY_RETURNS_FILE.exists():
         with open(DAILY_RETURNS_FILE, 'r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
             for row in reader:
-                rows.append({
+                rows_by_date[row['date']] = {
                     'date': row['date'],
                     'vix': row.get('vix', ''),
                     'price': row.get('price', ''),
@@ -1213,34 +1240,101 @@ def load_daily_returns_full():
                     'total_return_pct': row.get('total_return_pct', ''),
                     'cash': row.get('cash', ''),
                     'net_value': row.get('net_value', ''),
-                })
-    return rows
+                }
+
+    # 2. 从 dashboard_data.json 的 daily_snapshots 补充缺失数据
+    try:
+        dashboard = load_json(DASHBOARD_FILE)
+        principal = float(dashboard.get('account', {}).get('initial_capital', 7500.0))
+        snaps = dashboard.get('daily_snapshots', [])
+        for snap in snaps:
+            d = snap.get('date')
+            if not d:
+                continue
+            if d in rows_by_date:
+                # 如果 daily_returns 中该日期缺少某些字段，用 snapshot 补充
+                existing = rows_by_date[d]
+                pnl = float(snap.get('pnl', 0))
+                total_ret = (pnl / principal * 100) if principal > 0 else 0
+                if not existing.get('total_return_pct'):
+                    existing['total_return_pct'] = round(total_ret, 2)
+                if not existing.get('price'):
+                    existing['price'] = snap.get('price', '')
+                if not existing.get('daily_pnl'):
+                    existing['daily_pnl'] = snap.get('daily_pnl', '')
+                if not existing.get('unrealized_pnl'):
+                    existing['unrealized_pnl'] = snap.get('pnl', '')
+            else:
+                pnl = float(snap.get('pnl', 0))
+                total_ret = (pnl / principal * 100) if principal > 0 else 0
+                rows_by_date[d] = {
+                    'date': d,
+                    'vix': '',
+                    'price': snap.get('price', ''),
+                    'shares': '',
+                    'avg_cost': '',
+                    'market_value': '',
+                    'total_cost': '',
+                    'unrealized_pnl': snap.get('pnl', ''),
+                    'daily_pnl': snap.get('daily_pnl', ''),
+                    'return_pct': '',
+                    'total_return_pct': round(total_ret, 2),
+                    'cash': '',
+                    'net_value': '',
+                }
+    except Exception as e:
+        print(f"[警告] 从 dashboard_data.json 补充数据失败: {e}")
+
+    # 3. 按日期排序返回
+    sorted_dates = sorted(rows_by_date.keys())
+    return [rows_by_date[d] for d in sorted_dates]
 
 
 def generate_returns_curve_html(output_path, data_rows):
     """
-    生成交互式收益率曲线HTML（ECharts，支持鼠标悬停显示详细数据）
+    生成交互式收益率曲线HTML（ECharts，支持鼠标悬停显示详细数据 + 日/周/月/年切换）
     data_rows: list of dicts with full daily return fields
     """
     if not data_rows:
         return
 
-    # 构建JS数据数组
-    dates = [r['date'] for r in data_rows]
-    total_returns = [round(float(r['total_return_pct']), 2) for r in data_rows]
-    daily_pnls = [round(float(r.get('daily_pnl', 0) or 0), 2) for r in data_rows]
-    prices = [round(float(r.get('price', 0) or 0), 3) for r in data_rows]
-    vixs = [round(float(r.get('vix', 0) or 0), 2) for r in data_rows]
-    market_values = [round(float(r.get('market_value', 0) or 0), 2) for r in data_rows]
-    unrealized_pnls = [round(float(r.get('unrealized_pnl', 0) or 0), 2) for r in data_rows]
+    # 构建JS数据数组（原始日数据）
+    raw_data = []
+    for r in data_rows:
+        trp = r.get('total_return_pct', '')
+        try:
+            trp_f = float(trp) if trp != '' else None
+        except (ValueError, TypeError):
+            trp_f = None
 
-    dates_js = json.dumps(dates, ensure_ascii=False)
-    total_returns_js = json.dumps(total_returns, ensure_ascii=False)
-    daily_pnls_js = json.dumps(daily_pnls, ensure_ascii=False)
-    prices_js = json.dumps(prices, ensure_ascii=False)
-    vixs_js = json.dumps(vixs, ensure_ascii=False)
-    market_values_js = json.dumps(market_values, ensure_ascii=False)
-    unrealized_pnls_js = json.dumps(unrealized_pnls, ensure_ascii=False)
+        # 如果 total_return_pct 缺失，尝试用 unrealized_pnl / principal 推算
+        if trp_f is None:
+            try:
+                principal = get_tracking_principal_from_state()
+                pnl = float(r.get('unrealized_pnl', 0) or 0)
+                trp_f = (pnl / principal * 100) if principal > 0 else 0
+            except Exception:
+                trp_f = 0
+
+        raw_data.append({
+            'date': r['date'],
+            'total_return_pct': round(trp_f, 2) if trp_f is not None else 0,
+            'daily_pnl': round(float(r.get('daily_pnl', 0) or 0), 2),
+            'price': round(float(r.get('price', 0) or 0), 3),
+            'vix': round(float(r.get('vix', 0) or 0), 2) if r.get('vix') else None,
+            'market_value': round(float(r.get('market_value', 0) or 0), 2),
+            'unrealized_pnl': round(float(r.get('unrealized_pnl', 0) or 0), 2),
+        })
+
+    # 序列化为JS
+    raw_data_js = json.dumps(raw_data, ensure_ascii=False)
+    last = raw_data[-1]
+    last_date = last['date']
+    last_total = last['total_return_pct']
+    last_price = last['price']
+    last_vix = last['vix'] if last['vix'] is not None else '—'
+    last_mv = last['market_value']
+    last_pnl = last['unrealized_pnl']
 
     html_content = f"""<!DOCTYPE html>
 <html lang="zh-CN">
@@ -1251,11 +1345,16 @@ def generate_returns_curve_html(output_path, data_rows):
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <style>
   * {{ margin: 0; padding: 0; box-sizing: border-box; }}
-  body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f8fafc; padding: 20px; }}
+  body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f8fafc; padding: 16px; }}
   .chart-container {{ width: 100%; max-width: 960px; margin: 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 20px; }}
-  .chart-title {{ font-size: 18px; font-weight: 600; color: #1f2937; text-align: center; margin-bottom: 16px; }}
-  .chart-subtitle {{ font-size: 12px; color: #9ca3af; text-align: center; margin-bottom: 8px; }}
-  #chart {{ width: 100%; height: 420px; }}
+  .chart-header {{ display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; }}
+  .chart-title {{ font-size: 18px; font-weight: 600; color: #1f2937; }}
+  .period-tabs {{ display: flex; gap: 4px; background: #f3f4f6; border-radius: 6px; padding: 3px; }}
+  .period-tab {{ padding: 5px 14px; border: none; background: transparent; color: #6b7280; font-size: 12px; font-weight: 500; border-radius: 4px; cursor: pointer; transition: all 0.2s; }}
+  .period-tab:hover {{ color: #374151; }}
+  .period-tab.active {{ background: #fff; color: #1f2937; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }}
+  .chart-subtitle {{ font-size: 12px; color: #9ca3af; margin-bottom: 8px; }}
+  #chart {{ width: 100%; height: 400px; }}
   .stats-bar {{ display: flex; justify-content: center; gap: 24px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb; flex-wrap: wrap; }}
   .stat-item {{ text-align: center; }}
   .stat-label {{ font-size: 11px; color: #6b7280; }}
@@ -1266,120 +1365,192 @@ def generate_returns_curve_html(output_path, data_rows):
 </head>
 <body>
 <div class="chart-container">
-  <div class="chart-title">VIX定投策略 — 累计收益率曲线</div>
-  <div class="chart-subtitle">鼠标悬停查看每日详细数据 | 最后更新: {dates[-1] if dates else ''}</div>
+  <div class="chart-header">
+    <div class="chart-title">VIX定投策略 — 累计收益率曲线</div>
+    <div class="period-tabs">
+      <button class="period-tab active" data-period="day" onclick="switchPeriod('day')">日</button>
+      <button class="period-tab" data-period="week" onclick="switchPeriod('week')">周</button>
+      <button class="period-tab" data-period="month" onclick="switchPeriod('month')">月</button>
+      <button class="period-tab" data-period="year" onclick="switchPeriod('year')">年</button>
+    </div>
+  </div>
+  <div class="chart-subtitle">鼠标悬停查看详细数据 | 最后更新: {last_date}</div>
   <div id="chart"></div>
   <div class="stats-bar">
     <div class="stat-item">
       <div class="stat-label">累计收益率</div>
-      <div class="stat-value {'positive' if total_returns[-1] >= 0 else 'negative'}">{total_returns[-1]:+.2f}%</div>
+      <div class="stat-value {'positive' if last_total >= 0 else 'negative'}">{last_total:+.2f}%</div>
     </div>
     <div class="stat-item">
       <div class="stat-label">最新价格</div>
-      <div class="stat-value">{prices[-1]:.3f}元</div>
+      <div class="stat-value">{last_price:.3f}元</div>
     </div>
     <div class="stat-item">
       <div class="stat-label">最新VIX</div>
-      <div class="stat-value">{vixs[-1]:.2f}</div>
+      <div class="stat-value">{last_vix}</div>
     </div>
     <div class="stat-item">
       <div class="stat-label">持仓市值</div>
-      <div class="stat-value">{market_values[-1]:,.2f}元</div>
+      <div class="stat-value">{last_mv:,.2f}元</div>
     </div>
     <div class="stat-item">
       <div class="stat-label">浮动盈亏</div>
-      <div class="stat-value {'positive' if unrealized_pnls[-1] >= 0 else 'negative'}">{unrealized_pnls[-1]:+.2f}元</div>
+      <div class="stat-value {'positive' if last_pnl >= 0 else 'negative'}">{last_pnl:+.2f}元</div>
     </div>
   </div>
 </div>
 <script>
+  var rawData = {raw_data_js};
   var chart = echarts.init(document.getElementById('chart'));
-  var dates = {dates_js};
-  var totalReturns = {total_returns_js};
-  var dailyPnls = {daily_pnls_js};
-  var prices = {prices_js};
-  var vixs = {vixs_js};
-  var marketValues = {market_values_js};
-  var unrealizedPnls = {unrealized_pnls_js};
+  var currentPeriod = 'day';
 
-  var option = {{
-    tooltip: {{
-      trigger: 'axis',
-      backgroundColor: 'rgba(255,255,255,0.95)',
-      borderColor: '#e5e7eb',
-      borderWidth: 1,
-      textStyle: {{ color: '#1f2937', fontSize: 12 }},
-      formatter: function(params) {{
-        var idx = params[0].dataIndex;
-        var color = totalReturns[idx] >= 0 ? '#16a34a' : '#dc2626';
-        return '<div style="font-weight:600;margin-bottom:6px;">' + dates[idx] + '</div>' +
-          '<div style="display:grid;grid-template-columns:auto auto;gap:4px 16px;">' +
-          '<span style="color:#6b7280;">累计收益率:</span> <span style="font-weight:600;color:' + color + '">' + (totalReturns[idx] >= 0 ? '+' : '') + totalReturns[idx].toFixed(2) + '%</span>' +
-          '<span style="color:#6b7280;">当日盈亏:</span> <span style="font-weight:600;">' + (dailyPnls[idx] >= 0 ? '+' : '') + dailyPnls[idx].toFixed(2) + '元</span>' +
-          '<span style="color:#6b7280;">ETF价格:</span> <span style="font-weight:600;">' + prices[idx].toFixed(3) + '元</span>' +
-          '<span style="color:#6b7280;">VIX:</span> <span style="font-weight:600;">' + vixs[idx].toFixed(2) + '</span>' +
-          '<span style="color:#6b7280;">持仓市值:</span> <span style="font-weight:600;">' + marketValues[idx].toLocaleString('zh-CN', {{minimumFractionDigits:2}}) + '元</span>' +
-          '<span style="color:#6b7280;">浮动盈亏:</span> <span style="font-weight:600;color:' + color + '">' + (unrealizedPnls[idx] >= 0 ? '+' : '') + unrealizedPnls[idx].toFixed(2) + '元</span>' +
-          '</div>';
-      }}
-    }},
-    grid: {{ left: '3%', right: '4%', bottom: '3%', top: '8%', containLabel: true }},
-    xAxis: {{
-      type: 'category',
-      boundaryGap: false,
-      data: dates,
-      axisLine: {{ lineStyle: {{ color: '#e5e7eb' }} }},
-      axisLabel: {{ color: '#6b7280', fontSize: 10, rotate: 30 }},
-      axisTick: {{ show: false }}
-    }},
-    yAxis: {{
-      type: 'value',
-      axisLabel: {{ formatter: '{{value}}%', color: '#6b7280', fontSize: 11 }},
-      axisLine: {{ show: false }},
-      splitLine: {{ lineStyle: {{ color: '#f3f4f6', type: 'dashed' }} }},
-      scale: true
-    }},
-    series: [
-      {{
-        name: '累计收益率',
-        type: 'line',
-        smooth: 0.3,
-        symbol: 'circle',
-        symbolSize: 6,
-        showSymbol: false,
-        lineStyle: {{ width: 3, color: '#16a34a' }},
-        itemStyle: {{ color: '#16a34a', borderWidth: 2, borderColor: '#fff' }},
-        areaStyle: {{
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            {{ offset: 0, color: 'rgba(22, 163, 74, 0.2)' }},
-            {{ offset: 1, color: 'rgba(22, 163, 74, 0.02)' }}
-          ])
-        }},
-        data: totalReturns,
-        markLine: {{
-          silent: true,
-          symbol: 'none',
-          lineStyle: {{ color: '#9ca3af', type: 'solid', width: 1 }},
-          data: [{{ yAxis: 0 }}],
-          label: {{ show: false }}
-        }}
-      }}
-    ],
-    animationDuration: 800,
-    animationEasing: 'cubicOut'
-  }};
-
-  // 根据最终收益率颜色调整
-  if (totalReturns[totalReturns.length - 1] < 0) {{
-    option.series[0].lineStyle.color = '#dc2626';
-    option.series[0].itemStyle.color = '#dc2626';
-    option.series[0].areaStyle.color = new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-      {{ offset: 0, color: 'rgba(220, 38, 38, 0.2)' }},
-      {{ offset: 1, color: 'rgba(220, 38, 38, 0.02)' }}
-    ]);
+  function getWeekKey(dateStr) {{
+    var d = new Date(dateStr);
+    var day = d.getDay();
+    var diff = d.getDate() - day + (day === 0 ? -6 : 1);
+    var monday = new Date(d.setDate(diff));
+    return monday.getFullYear() + '-W' + String(Math.ceil((d.getDate())/7)).padStart(2,'0');
   }}
 
-  chart.setOption(option);
+  function getYearWeek(dateStr) {{
+    var d = new Date(dateStr);
+    d.setHours(0,0,0,0);
+    d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+    var yearStart = new Date(d.getFullYear(), 0, 1);
+    var weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    return d.getFullYear() + '-W' + String(weekNo).padStart(2, '0');
+  }}
+
+  function aggregateData(period) {{
+    if (period === 'day') return rawData;
+
+    var groups = {{}};
+    for (var i = 0; i < rawData.length; i++) {{
+      var item = rawData[i];
+      var d = new Date(item.date);
+      var key;
+      if (period === 'week') {{
+        key = getYearWeek(item.date);
+      }} else if (period === 'month') {{
+        key = item.date.substring(0, 7);
+      }} else if (period === 'year') {{
+        key = item.date.substring(0, 4);
+      }}
+      // 始终取该组最后一个数据（最新数据）
+      groups[key] = item;
+    }}
+
+    var result = [];
+    var sortedKeys = Object.keys(groups).sort();
+    for (var k = 0; k < sortedKeys.length; k++) {{
+      result.push(groups[sortedKeys[k]]);
+    }}
+    return result;
+  }}
+
+  function getPeriodLabel(period) {{
+    if (period === 'day') return '日';
+    if (period === 'week') return '周';
+    if (period === 'month') return '月';
+    if (period === 'year') return '年';
+    return period;
+  }}
+
+  function renderChart(period) {{
+    var data = aggregateData(period);
+    var dates = data.map(function(d) {{ return d.date; }});
+    var totalReturns = data.map(function(d) {{ return d.total_return_pct; }});
+    var dailyPnls = data.map(function(d) {{ return d.daily_pnl; }});
+    var prices = data.map(function(d) {{ return d.price; }});
+    var vixs = data.map(function(d) {{ return d.vix; }});
+    var marketValues = data.map(function(d) {{ return d.market_value; }});
+    var unrealizedPnls = data.map(function(d) {{ return d.unrealized_pnl; }});
+
+    var color = totalReturns[totalReturns.length - 1] >= 0 ? '#16a34a' : '#dc2626';
+    var areaColorStart = totalReturns[totalReturns.length - 1] >= 0 ? 'rgba(22, 163, 74, 0.2)' : 'rgba(220, 38, 38, 0.2)';
+    var areaColorEnd = totalReturns[totalReturns.length - 1] >= 0 ? 'rgba(22, 163, 74, 0.02)' : 'rgba(220, 38, 38, 0.02)';
+
+    var option = {{
+      tooltip: {{
+        trigger: 'axis',
+        backgroundColor: 'rgba(255,255,255,0.95)',
+        borderColor: '#e5e7eb',
+        borderWidth: 1,
+        textStyle: {{ color: '#1f2937', fontSize: 12 }},
+        formatter: function(params) {{
+          var idx = params[0].dataIndex;
+          var c = totalReturns[idx] >= 0 ? '#16a34a' : '#dc2626';
+          var vixStr = vixs[idx] !== null && vixs[idx] !== undefined ? vixs[idx].toFixed(2) : '—';
+          var mvStr = marketValues[idx] ? marketValues[idx].toLocaleString('zh-CN', {{minimumFractionDigits:2}}) : '—';
+          return '<div style="font-weight:600;margin-bottom:6px;">' + dates[idx] + '</div>' +
+            '<div style="display:grid;grid-template-columns:auto auto;gap:4px 16px;">' +
+            '<span style="color:#6b7280;">累计收益率:</span> <span style="font-weight:600;color:' + c + '">' + (totalReturns[idx] >= 0 ? '+' : '') + totalReturns[idx].toFixed(2) + '%</span>' +
+            '<span style="color:#6b7280;">当日盈亏:</span> <span style="font-weight:600;">' + (dailyPnls[idx] >= 0 ? '+' : '') + dailyPnls[idx].toFixed(2) + '元</span>' +
+            '<span style="color:#6b7280;">ETF价格:</span> <span style="font-weight:600;">' + (prices[idx] ? prices[idx].toFixed(3) : '—') + '元</span>' +
+            '<span style="color:#6b7280;">VIX:</span> <span style="font-weight:600;">' + vixStr + '</span>' +
+            '<span style="color:#6b7280;">持仓市值:</span> <span style="font-weight:600;">' + mvStr + '元</span>' +
+            '<span style="color:#6b7280;">浮动盈亏:</span> <span style="font-weight:600;color:' + c + '">' + (unrealizedPnls[idx] >= 0 ? '+' : '') + unrealizedPnls[idx].toFixed(2) + '元</span>' +
+            '</div>';
+        }}
+      }},
+      grid: {{ left: '3%', right: '4%', bottom: '3%', top: '10%', containLabel: true }},
+      xAxis: {{
+        type: 'category',
+        boundaryGap: false,
+        data: dates,
+        axisLine: {{ lineStyle: {{ color: '#e5e7eb' }} }},
+        axisLabel: {{ color: '#6b7280', fontSize: 10, rotate: period === 'day' ? 30 : 0 }},
+        axisTick: {{ show: false }}
+      }},
+      yAxis: {{
+        type: 'value',
+        axisLabel: {{ formatter: '{{value}}%', color: '#6b7280', fontSize: 11 }},
+        axisLine: {{ show: false }},
+        splitLine: {{ lineStyle: {{ color: '#f3f4f6', type: 'dashed' }} }},
+        scale: true
+      }},
+      series: [
+        {{
+          name: '累计收益率',
+          type: 'line',
+          smooth: 0.3,
+          symbol: 'circle',
+          symbolSize: period === 'day' ? 4 : 7,
+          showSymbol: period !== 'day',
+          lineStyle: {{ width: 3, color: color }},
+          itemStyle: {{ color: color, borderWidth: 2, borderColor: '#fff' }},
+          areaStyle: {{
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              {{ offset: 0, color: areaColorStart }},
+              {{ offset: 1, color: areaColorEnd }}
+            ])
+          }},
+          data: totalReturns,
+          markLine: {{
+            silent: true,
+            symbol: 'none',
+            lineStyle: {{ color: '#9ca3af', type: 'solid', width: 1 }},
+            data: [{{ yAxis: 0 }}],
+            label: {{ show: false }}
+          }}
+        }}
+      ],
+      animationDuration: 500,
+      animationEasing: 'cubicOut'
+    }};
+
+    chart.setOption(option, true);
+  }}
+
+  function switchPeriod(period) {{
+    currentPeriod = period;
+    document.querySelectorAll('.period-tab').forEach(function(btn) {{
+      btn.classList.toggle('active', btn.dataset.period === period);
+    }});
+    renderChart(period);
+  }}
+
+  renderChart('day');
   window.addEventListener('resize', function() {{ chart.resize(); }});
 </script>
 </body>
