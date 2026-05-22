@@ -36,7 +36,8 @@
       <button class="period-tab" data-period="year" onclick="switchPeriod('year')">年</button>
     </div>
   </div>
-  <div class="chart-subtitle">鼠标悬停查看详细数据 | 最后更新: 2026-05-21</div>
+  <div class="chart-subtitle">鼠标悬停查看详细数据 | 最后更新: 2026-05-22</div>
+  <div id="truncation-notice" style="display:none; font-size:12px; color:#d97706; margin-bottom:8px; padding:6px 10px; background:#fffbeb; border-radius:4px; border:1px solid #fcd34d;"></div>
   <div id="chart"></div>
   <div class="stats-bar">
     <div class="stat-item">
@@ -49,7 +50,7 @@
     </div>
     <div class="stat-item">
       <div class="stat-label">最新VIX</div>
-      <div class="stat-value">17.57</div>
+      <div class="stat-value">17.07</div>
     </div>
     <div class="stat-item">
       <div class="stat-label">持仓市值</div>
@@ -62,7 +63,7 @@
   </div>
 </div>
 <script>
-  var rawData = [{"date": "2026-03-24", "total_return_pct": -0.09, "daily_pnl": -2.77, "price": 1.947, "vix": 21.0, "market_value": 3000.23, "unrealized_pnl": -2.77}, {"date": "2026-04-07", "total_return_pct": 0.04, "daily_pnl": 5.03, "price": 1.952, "vix": 19.5, "market_value": 6008.26, "unrealized_pnl": 2.26}, {"date": "2026-04-09", "total_return_pct": 3.82, "daily_pnl": 227.37, "price": 2.026, "vix": 21.22, "market_value": 6235.63, "unrealized_pnl": 229.63}, {"date": "2026-04-22", "total_return_pct": 9.31, "daily_pnl": 0.0, "price": 2.133, "vix": 19.26, "market_value": 6565.37, "unrealized_pnl": 559.37}, {"date": "2026-05-01", "total_return_pct": 10.04, "daily_pnl": 0.0, "price": 2.196, "vix": null, "market_value": 0.0, "unrealized_pnl": 753.29}, {"date": "2026-05-11", "total_return_pct": 17.51, "daily_pnl": 560.2, "price": 2.378, "vix": null, "market_value": 0.0, "unrealized_pnl": 1313.48}, {"date": "2026-05-12", "total_return_pct": 17.51, "daily_pnl": 0.0, "price": 2.378, "vix": null, "market_value": 0.0, "unrealized_pnl": 1313.48}, {"date": "2026-05-13", "total_return_pct": 17.51, "daily_pnl": 0.0, "price": 2.378, "vix": null, "market_value": 0.0, "unrealized_pnl": 1313.48}, {"date": "2026-05-14", "total_return_pct": 17.23, "daily_pnl": -21.55, "price": 2.371, "vix": null, "market_value": 0.0, "unrealized_pnl": 1291.94}, {"date": "2026-05-15", "total_return_pct": 17.23, "daily_pnl": 0.0, "price": 2.371, "vix": null, "market_value": 0.0, "unrealized_pnl": 1291.94}, {"date": "2026-05-18", "total_return_pct": 14.8, "daily_pnl": -181.6, "price": 2.312, "vix": null, "market_value": 0.0, "unrealized_pnl": 1110.34}, {"date": "2026-05-19", "total_return_pct": 14.62, "daily_pnl": 0.0, "price": 2.306, "vix": 18.15, "market_value": 8596.77, "unrealized_pnl": 1091.72}, {"date": "2026-05-20", "total_return_pct": 14.56, "daily_pnl": 0.0, "price": 2.306, "vix": null, "market_value": 0.0, "unrealized_pnl": 1091.72}, {"date": "2026-05-21", "total_return_pct": 16.61, "daily_pnl": 149.12, "price": 2.346, "vix": 17.57, "market_value": 8745.89, "unrealized_pnl": 1240.84}];
+  var rawData = [{"date": "2026-03-24", "total_return_pct": -0.09, "daily_pnl": -2.77, "price": 1.947, "vix": 21.0, "market_value": 3000.23, "unrealized_pnl": -2.77}, {"date": "2026-04-07", "total_return_pct": 0.04, "daily_pnl": 5.03, "price": 1.952, "vix": 19.5, "market_value": 6008.26, "unrealized_pnl": 2.26}, {"date": "2026-04-09", "total_return_pct": 3.82, "daily_pnl": 227.37, "price": 2.026, "vix": 21.22, "market_value": 6235.63, "unrealized_pnl": 229.63}, {"date": "2026-04-22", "total_return_pct": 9.31, "daily_pnl": 0.0, "price": 2.133, "vix": 19.26, "market_value": 6565.37, "unrealized_pnl": 559.37}, {"date": "2026-05-11", "total_return_pct": 17.51, "daily_pnl": 560.2, "price": 2.378, "vix": null, "market_value": 0.0, "unrealized_pnl": 1313.48}, {"date": "2026-05-12", "total_return_pct": 17.51, "daily_pnl": 0.0, "price": 2.378, "vix": null, "market_value": 0.0, "unrealized_pnl": 1313.48}, {"date": "2026-05-13", "total_return_pct": 17.51, "daily_pnl": 0.0, "price": 2.378, "vix": null, "market_value": 0.0, "unrealized_pnl": 1313.48}, {"date": "2026-05-14", "total_return_pct": 17.23, "daily_pnl": -21.55, "price": 2.371, "vix": null, "market_value": 0.0, "unrealized_pnl": 1291.94}, {"date": "2026-05-15", "total_return_pct": 17.23, "daily_pnl": 0.0, "price": 2.371, "vix": null, "market_value": 0.0, "unrealized_pnl": 1291.94}, {"date": "2026-05-18", "total_return_pct": 14.8, "daily_pnl": -181.6, "price": 2.312, "vix": null, "market_value": 0.0, "unrealized_pnl": 1110.34}, {"date": "2026-05-19", "total_return_pct": 14.62, "daily_pnl": 0.0, "price": 2.306, "vix": 18.15, "market_value": 8596.77, "unrealized_pnl": 1091.72}, {"date": "2026-05-20", "total_return_pct": 14.56, "daily_pnl": 0.0, "price": 2.306, "vix": null, "market_value": 0.0, "unrealized_pnl": 1091.72}, {"date": "2026-05-21", "total_return_pct": 16.61, "daily_pnl": 149.12, "price": 2.346, "vix": 17.57, "market_value": 8745.89, "unrealized_pnl": 1240.84}, {"date": "2026-05-22", "total_return_pct": 16.61, "daily_pnl": 0.0, "price": 2.346, "vix": 17.07, "market_value": 8745.89, "unrealized_pnl": 1240.84}];
   var chart = echarts.init(document.getElementById('chart'));
   var currentPeriod = 'day';
 
@@ -83,31 +84,40 @@
     return d.getFullYear() + '-W' + String(weekNo).padStart(2, '0');
   }
 
+  // 各周期最大显示限制（超过则截断并提示）
+  var PERIOD_LIMITS = { day: 180, week: 52, month: 24, year: Infinity };
+
   function aggregateData(period) {
-    if (period === 'day') return rawData;
-
-    var groups = {};
-    for (var i = 0; i < rawData.length; i++) {
-      var item = rawData[i];
-      var d = new Date(item.date);
-      var key;
-      if (period === 'week') {
-        key = getYearWeek(item.date);
-      } else if (period === 'month') {
-        key = item.date.substring(0, 7);
-      } else if (period === 'year') {
-        key = item.date.substring(0, 4);
+    var data;
+    if (period === 'day') {
+      data = rawData;
+    } else {
+      var groups = {};
+      for (var i = 0; i < rawData.length; i++) {
+        var item = rawData[i];
+        var key;
+        if (period === 'week') {
+          key = getYearWeek(item.date);
+        } else if (period === 'month') {
+          key = item.date.substring(0, 7);
+        } else if (period === 'year') {
+          key = item.date.substring(0, 4);
+        }
+        groups[key] = item;
       }
-      // 始终取该组最后一个数据（最新数据）
-      groups[key] = item;
+      data = [];
+      var sortedKeys = Object.keys(groups).sort();
+      for (var k = 0; k < sortedKeys.length; k++) {
+        data.push(groups[sortedKeys[k]]);
+      }
     }
 
-    var result = [];
-    var sortedKeys = Object.keys(groups).sort();
-    for (var k = 0; k < sortedKeys.length; k++) {
-      result.push(groups[sortedKeys[k]]);
+    // 应用最大限制截断
+    var limit = PERIOD_LIMITS[period];
+    if (data.length > limit) {
+      return { data: data.slice(data.length - limit), truncated: true, total: data.length, shown: limit };
     }
-    return result;
+    return { data: data, truncated: false, total: data.length, shown: data.length };
   }
 
   function getPeriodLabel(period) {
@@ -119,7 +129,8 @@
   }
 
   function renderChart(period) {
-    var data = aggregateData(period);
+    var result = aggregateData(period);
+    var data = result.data;
     var dates = data.map(function(d) { return d.date; });
     var totalReturns = data.map(function(d) { return d.total_return_pct; });
     var dailyPnls = data.map(function(d) { return d.daily_pnl; });
@@ -127,6 +138,17 @@
     var vixs = data.map(function(d) { return d.vix; });
     var marketValues = data.map(function(d) { return d.market_value; });
     var unrealizedPnls = data.map(function(d) { return d.unrealized_pnl; });
+
+    // 截断提示
+    var noticeEl = document.getElementById('truncation-notice');
+    if (result.truncated) {
+      var nextPeriod = { day: '周', week: '月', month: '年' };
+      noticeEl.innerHTML = '<span style="color:#d97706;">⚠️ 数据量较大（共' + result.total + '条），当前仅显示最近' + result.shown + '条。' +
+        '建议切换到 <strong>' + nextPeriod[period] + '</strong> 模式查看全部历史 →</span>';
+      noticeEl.style.display = 'block';
+    } else {
+      noticeEl.style.display = 'none';
+    }
 
     var color = totalReturns[totalReturns.length - 1] >= 0 ? '#16a34a' : '#dc2626';
     var areaColorStart = totalReturns[totalReturns.length - 1] >= 0 ? 'rgba(22, 163, 74, 0.2)' : 'rgba(220, 38, 38, 0.2)';
