@@ -1375,6 +1375,7 @@ def generate_returns_curve_html(output_path, data_rows):
     </div>
   </div>
   <div class="chart-subtitle">鼠标悬停查看详细数据 | 最后更新: {last_date}</div>
+  <div id="truncation-notice" style="display:none; font-size:12px; color:#d97706; margin-bottom:8px; padding:6px 10px; background:#fffbeb; border-radius:4px; border:1px solid #fcd34d;"></div>
   <div id="chart"></div>
   <div class="stats-bar">
     <div class="stat-item">
@@ -1421,31 +1422,40 @@ def generate_returns_curve_html(output_path, data_rows):
     return d.getFullYear() + '-W' + String(weekNo).padStart(2, '0');
   }}
 
+  // 各周期最大显示限制（超过则截断并提示）
+  var PERIOD_LIMITS = {{ day: 180, week: 52, month: 24, year: Infinity }};
+
   function aggregateData(period) {{
-    if (period === 'day') return rawData;
-
-    var groups = {{}};
-    for (var i = 0; i < rawData.length; i++) {{
-      var item = rawData[i];
-      var d = new Date(item.date);
-      var key;
-      if (period === 'week') {{
-        key = getYearWeek(item.date);
-      }} else if (period === 'month') {{
-        key = item.date.substring(0, 7);
-      }} else if (period === 'year') {{
-        key = item.date.substring(0, 4);
+    var data;
+    if (period === 'day') {{
+      data = rawData;
+    }} else {{
+      var groups = {{}};
+      for (var i = 0; i < rawData.length; i++) {{
+        var item = rawData[i];
+        var key;
+        if (period === 'week') {{
+          key = getYearWeek(item.date);
+        }} else if (period === 'month') {{
+          key = item.date.substring(0, 7);
+        }} else if (period === 'year') {{
+          key = item.date.substring(0, 4);
+        }}
+        groups[key] = item;
       }}
-      // 始终取该组最后一个数据（最新数据）
-      groups[key] = item;
+      data = [];
+      var sortedKeys = Object.keys(groups).sort();
+      for (var k = 0; k < sortedKeys.length; k++) {{
+        data.push(groups[sortedKeys[k]]);
+      }}
     }}
 
-    var result = [];
-    var sortedKeys = Object.keys(groups).sort();
-    for (var k = 0; k < sortedKeys.length; k++) {{
-      result.push(groups[sortedKeys[k]]);
+    // 应用最大限制截断
+    var limit = PERIOD_LIMITS[period];
+    if (data.length > limit) {{
+      return {{ data: data.slice(data.length - limit), truncated: true, total: data.length, shown: limit }};
     }}
-    return result;
+    return {{ data: data, truncated: false, total: data.length, shown: data.length }};
   }}
 
   function getPeriodLabel(period) {{
@@ -1457,7 +1467,8 @@ def generate_returns_curve_html(output_path, data_rows):
   }}
 
   function renderChart(period) {{
-    var data = aggregateData(period);
+    var result = aggregateData(period);
+    var data = result.data;
     var dates = data.map(function(d) {{ return d.date; }});
     var totalReturns = data.map(function(d) {{ return d.total_return_pct; }});
     var dailyPnls = data.map(function(d) {{ return d.daily_pnl; }});
@@ -1465,6 +1476,17 @@ def generate_returns_curve_html(output_path, data_rows):
     var vixs = data.map(function(d) {{ return d.vix; }});
     var marketValues = data.map(function(d) {{ return d.market_value; }});
     var unrealizedPnls = data.map(function(d) {{ return d.unrealized_pnl; }});
+
+    // 截断提示
+    var noticeEl = document.getElementById('truncation-notice');
+    if (result.truncated) {{
+      var nextPeriod = {{ day: '周', week: '月', month: '年' }};
+      noticeEl.innerHTML = '<span style="color:#d97706;">⚠️ 数据量较大（共' + result.total + '条），当前仅显示最近' + result.shown + '条。' +
+        '建议切换到 <strong>' + nextPeriod[period] + '</strong> 模式查看全部历史 →</span>';
+      noticeEl.style.display = 'block';
+    }} else {{
+      noticeEl.style.display = 'none';
+    }}
 
     var color = totalReturns[totalReturns.length - 1] >= 0 ? '#16a34a' : '#dc2626';
     var areaColorStart = totalReturns[totalReturns.length - 1] >= 0 ? 'rgba(22, 163, 74, 0.2)' : 'rgba(220, 38, 38, 0.2)';
