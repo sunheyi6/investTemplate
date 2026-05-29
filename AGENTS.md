@@ -109,6 +109,7 @@ grep -q "recent_actions" public/dashboard/dashboard_snapshot.json && echo "OK" |
 - [ ] 数据文件已更新
 - [ ] 网页展示页面数据一致
 - [ ] public目录已同步
+- [ ] **收益率曲线(returns_curve.html)与数据保持一致** ⭐易遗漏！价格/收益/市值必须与state.json同步
 
 详细规范见：[docs/agents/06-portfolio-management.md](./docs/agents/06-portfolio-management.md)
 
@@ -266,8 +267,42 @@ npm run docs:dev
 
 ---
 
+### 案例3：VIX定投策略收益率曲线与数据不一致（2026-05-29）⭐⭐⭐⭐
+
+**错误描述**：
+更新VIX定投策略的持仓数据、价格和收益后，网页上的收益率曲线（`returns_curve.html`）仍显示旧数据：累计收益率+16.61%、浮盈+1240.84元、价格2.346元。而实际重建后的正确数据应为：+23.03%、+1933.69元、2.540元。两者严重不符。
+
+**错误数据**：
+- 曲线显示：收益率+16.61%，价格2.346元，市值8,745.89元
+- 实际数据：收益率+23.03%，价格2.540元，市值10,330.18元
+
+**根本原因**：
+1. ❌ 只更新了state.json、dashboard_data.json和markdown文件
+2. ❌ 遗漏了`returns_curve.html`和`returns_curve.svg`的同步更新
+3. ❌ 未检查曲线中的`rawData`数组是否与最新持仓、价格、收益一致
+
+**影响**：
+- 网页展示的数据与曲线自相矛盾
+- 用户发现后指出问题，信任度下降
+- 需要额外一轮修正和提交
+
+**预防措施**：
+- ✅ **每次更新VIX数据后，必须同步重新生成收益率曲线**
+- ✅ 检查曲线底部统计栏（累计收益率/最新价格/持仓市值/浮动盈亏）与state.json一致
+- ✅ 检查曲线`rawData`中的价格序列与真实市场数据一致
+- ✅ 使用脚本`scripts/generate_returns_curve.py`自动重新生成
+
+**检查清单（更新VIX策略数据时）**：
+- [ ] state.json / dashboard_data.json 已更新
+- [ ] portfolio/vix-dca-strategy.md 已更新
+- [ ] public/vix_strategy/dashboard_data.json 已同步
+- [ ] **returns_curve.html 已重新生成并与数据一致** ⭐易遗漏！
+- [ ] returns_curve.svg 已同步更新（如需要）
+
+---
+
 **版本**: V5.5.20+TTM PE 表面估值优先修正版  
-**最后更新**: 2026-05-21
+**最后更新**: 2026-05-29
 
 ---
 
