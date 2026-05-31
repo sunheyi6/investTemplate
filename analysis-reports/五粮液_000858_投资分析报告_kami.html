@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<!-- ==================================================================
+     五粮液（000858.SZ）个股研报 · Kami 排版
+     模板版本: V5.5.20 表面估值优先与净现金陷阱修正版
+     数据来源: 2023-2025年年报、2026年一季报（S级）
+     ================================================================== -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>五粮液 · 个股研报</title>
+<meta name="author" content="investTemplate">
+<meta name="description" content="五粮液000858投资分析：品牌护城河极厚，但当前PE不满足V5.5.20硬约束，建议观望等待估值回归。">
+<meta name="keywords" content="五粮液, 000858, 白酒, 投资分析, 估值, PE">
+<meta name="generator" content="Kami">
+<style>
+  /* Regular weight */
+  @font-face {
+    font-family: "TsangerJinKai02";
+    src: url("https://cdn.jsdelivr.net/gh/tw93/Kami@main/assets/fonts/TsangerJinKai02-W04.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  /* Bold weight - W05 for all bold variants */
+  @font-face {
+    font-family: "TsangerJinKai02";
+    src: url("https://cdn.jsdelivr.net/gh/tw93/Kami@main/assets/fonts/TsangerJinKai02-W05.ttf") format("truetype");
+    font-weight: 500;
+    font-style: normal;
+  }
+
+  @page {
+    size: A4;
+    margin: 16mm 18mm 18mm 18mm;
+    background: #f5f4ed;
+
+    @bottom-center {
+      content: counter(page) "  ·  五粮液 研报";
+      font-family: "TsangerJinKai02", "Source Han Serif SC",
+                   "Noto Serif CJK SC", "Songti SC", Georgia, serif;
+      font-size: 9pt;
+      color: #6b6a64;
+    }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --parchment: #f5f4ed;
+    --ivory:     #faf9f5;
+    --near-black:#141413;
+    --dark-warm: #3d3d3a;
+    --olive:     #504e49;
+    --stone:     #6b6a64;
+    --brand:     #1B365D;
+    --border:    #e8e6dc;
+    --border-soft:#e5e3d8;
+    --tag-bg:    #E4ECF5;
+    --positive:  #1B365D;
+    --negative:  #6b6a64;
+    --serif: "TsangerJinKai02", "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", "STSong", Georgia, serif;
+    --sans: var(--serif);
+
+    --rhythm-module:  14pt;
+    --rhythm-section: 18pt;
+  }
+
+  html, body { background: var(--parchment); }
+
+  @media screen {
+    body { max-width: 210mm; margin: 0 auto; padding: 16mm 18mm 18mm 18mm; }
+  }
+
+  body {
+    color: var(--near-black);
+    font-family: var(--serif);
+    font-size: 10pt;
+    line-height: 1.5;
+    letter-spacing: 0.3pt;
+    widows: 3;
+    orphans: 3;
+  }
+
+  strong { font-weight: 500; }
+  .hl { color: var(--brand); font-weight: 500; }
+
+  /* ========== HEADER ========== */
+  .report-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--rhythm-module);
+    border-left: 2.5pt solid var(--brand);
+    border-radius: 1.5pt;
+    padding-left: 8pt;
+  }
+  .ticker-block { flex: 1; }
+  .ticker-eyebrow {
+    font-size: 9pt;
+    color: var(--brand);
+    letter-spacing: 1pt;
+    text-transform: uppercase;
+    margin-bottom: 4pt;
+  }
+  .ticker-name {
+    font-family: var(--serif);
+    font-size: 24pt;
+    font-weight: 500;
+    color: var(--near-black);
+    line-height: 1.15;
+    margin-bottom: 4pt;
+  }
+  .ticker-sub {
+    font-size: 10pt;
+    color: var(--olive);
+    line-height: 1.4;
+  }
+  .price-block {
+    text-align: right;
+    padding-top: 4pt;
+  }
+  .price-current {
+    font-family: var(--serif);
+    font-size: 28pt;
+    font-weight: 500;
+    color: var(--near-black);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .price-change {
+    font-size: 10pt;
+    font-weight: 500;
+    margin-top: 2pt;
+    font-variant-numeric: tabular-nums;
+  }
+  .price-change.up { color: var(--positive); }
+  .price-change.down { color: var(--negative); }
+  .price-date {
+    font-size: 9pt;
+    color: var(--stone);
+    margin-top: 2pt;
+  }
+
+  /* ========== METRICS ========== */
+  .metrics {
+    display: flex;
+    gap: 14pt;
+    margin-bottom: 16pt;
+    padding: 6pt 0;
+    border-top: 0.3pt dotted var(--border);
+    border-bottom: 0.3pt dotted var(--border);
+  }
+  .metric {
+    flex: 1;
+    display: flex;
+    align-items: baseline;
+    gap: 4pt;
+  }
+  .metric-value {
+    font-family: var(--serif);
+    font-size: 16pt;
+    font-weight: 500;
+    color: var(--brand);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .metric-label {
+    font-size: 9pt;
+    color: var(--olive);
+    line-height: 1.3;
+  }
+
+  /* ========== SECTIONS ========== */
+  h2 {
+    font-family: var(--serif);
+    font-size: 16pt;
+    font-weight: 500;
+    color: var(--near-black);
+    margin: 18pt 0 6pt 0;
+    break-after: avoid;
+  }
+
+  h3 {
+    font-size: 13pt;
+    font-weight: 500;
+    color: var(--dark-warm);
+    margin: 12pt 0 4pt 0;
+    break-after: avoid;
+  }
+
+  p { margin: 0 0 8pt 0; line-height: 1.5; widows: 2; orphans: 2; }
+
+  ul, ol {
+    margin: 4pt 0 8pt 0;
+    padding-left: 18pt;
+    line-height: 1.5;
+  }
+  ul li::marker { color: var(--brand); }
+  ol li::marker { color: var(--brand); font-weight: 500; }
+
+  /* ========== TAG ========== */
+  .tag {
+    display: inline-block;
+    background: var(--tag-bg);
+    color: var(--brand);
+    font-size: 9pt;
+    font-weight: 500;
+    padding: 1pt 6pt;
+    border-radius: 3pt;
+    margin-right: 3pt;
+  }
+
+  /* ========== TABLE (kami-table) ========== */
+  table, .kami-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9.5pt;
+    margin: 8pt 0;
+    break-inside: avoid;
+  }
+  table th, .kami-table th {
+    text-align: left;
+    font-weight: 500;
+    color: var(--dark-warm);
+    padding: 5pt 8pt;
+    border-bottom: 1pt solid var(--border);
+    background: transparent;
+  }
+  table td, .kami-table td {
+    padding: 4pt 8pt;
+    border-bottom: 0.3pt solid var(--border-soft);
+    vertical-align: top;
+  }
+  table.compact th, .kami-table.compact th { padding: 3pt 6pt; font-size: 8pt; }
+  table.compact td, .kami-table.compact td { padding: 2pt 6pt; font-size: 8pt; line-height: 1.4; }
+  table.financial td:not(:first-child), .kami-table.financial td:not(:first-child) {
+    text-align: right; font-variant-numeric: tabular-nums;
+  }
+  table.financial th:not(:first-child), .kami-table.financial th:not(:first-child) { text-align: right; }
+  table.striped tbody tr:nth-child(even) td, .kami-table.striped tbody tr:nth-child(even) td {
+    background: var(--ivory);
+  }
+  table .total td, .kami-table .total td {
+    font-weight: 500; border-top: 1pt solid var(--brand); border-bottom: none; color: var(--near-black);
+  }
+
+  /* ========== CALLOUT ========== */
+  .callout {
+    background: var(--ivory);
+    border-left: 2pt solid var(--brand);
+    padding: 8pt 12pt;
+    border-radius: 3pt;
+    margin: 10pt 0;
+    line-height: 1.5;
+    break-inside: avoid;
+  }
+  .callout blockquote,
+  .callout .quote {
+    border-left: none;
+    padding-left: 0;
+    margin: 6pt 0;
+    color: var(--olive);
+  }
+  .callout blockquote:first-child,
+  .callout .quote:first-child { margin-top: 0; }
+  .callout blockquote:last-child,
+  .callout .quote:last-child  { margin-bottom: 0; }
+
+  /* ========== FIGURE ========== */
+  figure {
+    margin: 12pt 0;
+    break-inside: avoid;
+  }
+  figcaption {
+    font-size: 9pt;
+    color: var(--stone);
+    margin-top: 4pt;
+    text-align: center;
+  }
+
+  /* ========== RISK MATRIX ========== */
+  .risk-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10pt;
+    margin: 8pt 0;
+  }
+  .risk-item {
+    padding: 6pt 10pt;
+    background: var(--ivory);
+    border-radius: 3pt;
+    break-inside: avoid;
+  }
+  .risk-label {
+    font-size: 9pt;
+    font-weight: 500;
+    color: var(--brand);
+    margin-bottom: 2pt;
+  }
+  .risk-desc {
+    font-size: 9pt;
+    color: var(--olive);
+    line-height: 1.4;
+  }
+
+  /* ========== TWO-COLUMN ========== */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16pt;
+  }
+
+  /* ========== ANALYST SUMMARY ========== */
+  .analyst-box {
+    background: var(--ivory);
+    border-left: 1.4pt solid var(--brand);
+    border-radius: 4pt;
+    padding: 10pt 14pt;
+    margin: 12pt 0;
+    break-inside: avoid;
+  }
+
+  /* ========== CHART PLACEHOLDER ========== */
+  .chart-placeholder {
+    background: var(--ivory);
+    border-radius: 4pt;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--stone);
+    font-size: 9pt;
+  }
+  .analyst-label {
+    font-size: 9pt;
+    color: var(--brand);
+    letter-spacing: 0.5pt;
+    text-transform: uppercase;
+    margin-bottom: 4pt;
+  }
+
+  /* ========== FOOTER ========== */
+  .report-footer {
+    margin-top: 16pt;
+    padding-top: 6pt;
+    border-top: 0.3pt dotted var(--border);
+    font-size: 9pt;
+    color: var(--stone);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .page-break { break-before: page; }
+</style>
+</head>
+<body>
+
+<!-- ========== HEADER ========== -->
+<div class="report-header">
+  <div class="ticker-block">
+    <div class="ticker-eyebrow">个股研报 · V5.5.20 框架</div>
+    <div class="ticker-name">五粮液 <span style="font-size: 14pt; color: var(--stone);">000858.SZ</span></div>
+    <div class="ticker-sub">白酒行业 · 深交所 · 浓香型龙头 · 地方国企（宜宾市国资委控股~54%）</div>
+  </div>
+  <div class="price-block">
+    <div class="price-current">¥85.35</div>
+    <div class="price-date">2026-05-21</div>
+  </div>
+</div>
+
+<!-- ========== METRICS ========== -->
+<div class="metrics">
+  <div class="metric">
+    <div class="metric-value">3,313亿</div>
+    <div class="metric-label">市值<br><span style="font-size:8pt;color:var(--stone);">总股本38.82亿×85.35元</span></div>
+  </div>
+  <div class="metric">
+    <div class="metric-value">10.4×</div>
+    <div class="metric-label">P/E（2024口径）<br><span style="font-size:8pt;color:var(--stone);">2025年调整后37×</span></div>
+  </div>
+  <div class="metric">
+    <div class="metric-value">405亿</div>
+    <div class="metric-label">营收（2025）<br><span style="font-size:8pt;color:var(--stone);">调整后口径</span></div>
+  </div>
+  <div class="metric">
+    <div class="metric-value">82%+</div>
+    <div class="metric-label">毛利率（酒类）<br><span style="font-size:8pt;color:var(--stone);">五粮液产品~92%</span></div>
+  </div>
+</div>
+
+<!-- ========== INVESTMENT THESIS ========== -->
+<h2>投资逻辑</h2>
+<p>五粮液是中国浓香型白酒绝对龙头，品牌护城河极厚，消费者心智稳固。公司财务结构极为稳健：<span class="hl">现金储备1,241亿元</span>，无有息负债，财务费用为负（利息收入26.6亿），预收款模式带来优秀现金流质量。浓香型白酒市场占有率最高、消费人群最广，五粮液以"香气悠久、味醇厚"的独特风格具有广泛而坚实的消费群体基础。</p>
+<p>然而，<span class="hl">当前估值不满足V5.5.20硬约束</span>。2025年会计政策调整导致净利润基数异常（89.54亿，PE 37倍），即使按2024年正常利润318.53亿计算，表面PE也达10.4倍，处于硬约束边界。白酒行业仍处于深度调整期，政商务需求低迷，渠道库存去化尚未完成。当前股价已price in较强的恢复预期。</p>
+
+<div class="callout">
+  <strong>一句话结论：</strong>暂不介入，放入观察列表。品牌与现金极佳，但PE不达标（10.4倍处于边界，2025年口径37倍严重超标）。建议等待股价跌至70元以下（对应2024利润PE约8.5倍）再评估。
+</div>
+
+<!-- ========== FINANCIALS ========== -->
+<h2>财务概览</h2>
+<table class="financial striped">
+  <thead>
+    <tr>
+      <th>指标</th>
+      <th>FY2023</th>
+      <th>FY2024</th>
+      <th>FY2025</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>营业收入</td>
+      <td>832.72亿</td>
+      <td>891.75亿</td>
+      <td>405.29亿</td>
+    </tr>
+    <tr>
+      <td>归母净利润</td>
+      <td>302.11亿</td>
+      <td>318.53亿</td>
+      <td>89.54亿</td>
+    </tr>
+    <tr>
+      <td>EPS</td>
+      <td>7.78元</td>
+      <td>8.20元</td>
+      <td>2.31元</td>
+    </tr>
+    <tr>
+      <td>毛利率（酒类）</td>
+      <td>~82%</td>
+      <td>~82.6%</td>
+      <td>~82%</td>
+    </tr>
+    <tr>
+      <td>经营现金流净额</td>
+      <td>417.42亿</td>
+      <td>~339亿</td>
+      <td>~297亿</td>
+    </tr>
+    <tr class="total">
+      <td>现金及等价物</td>
+      <td>1,155亿</td>
+      <td>1,248亿</td>
+      <td>1,241亿</td>
+    </tr>
+  </tbody>
+</table>
+
+<p style="font-size: 9pt; color: var(--stone);">注：2025年营收与净利润大幅下滑系会计政策调整（收入确认方式变更）所致，非真实销售崩溃。2026Q1营收+33.7%、净利润+82.6%，验证低基数为暂时性。</p>
+
+<!-- ========== VALUATION ========== -->
+<h2>估值与安全边际</h2>
+<table class="financial striped">
+  <thead>
+    <tr>
+      <th>估值方法</th>
+      <th>当前值</th>
+      <th>硬约束标准</th>
+      <th>评级</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>表面PE（2024静）</td>
+      <td><strong>10.4倍</strong></td>
+      <td>&lt;10倍</td>
+      <td>⚠️ 边界</td>
+    </tr>
+    <tr>
+      <td>表面PE（2025静）</td>
+      <td>37.0倍</td>
+      <td>&lt;10倍</td>
+      <td>❌ 严重超标</td>
+    </tr>
+    <tr>
+      <td>表面PE（TTM）</td>
+      <td>26.3倍</td>
+      <td>&lt;10倍</td>
+      <td>❌ 远超约束</td>
+    </tr>
+    <tr>
+      <td>净现金/市值</td>
+      <td>37%</td>
+      <td>&gt;20%</td>
+      <td>✅ 可观</td>
+    </tr>
+    <tr>
+      <td>FCF/市值（2024）</td>
+      <td>~10.2%</td>
+      <td>&gt;10%</td>
+      <td>⚠️ 刚好合格</td>
+    </tr>
+    <tr>
+      <td>PB</td>
+      <td>~2.6倍</td>
+      <td>&lt;1倍</td>
+      <td>❌ 未破净</td>
+    </tr>
+    <tr>
+      <td>正常股息率</td>
+      <td>~5.3%</td>
+      <td>&gt;4%（绑定PE&lt;10）</td>
+      <td>✅ 合格</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout">
+  <strong>V5.5.20 估值纪律：</strong>表面PE&lt;10倍是硬约束，不是建议。即使品牌再好、现金再多，PE不达标就不介入。净现金1,241亿虽覆盖市值37%，但市场不给净现金定价——该指标仅证明"跌不下去"，不证明"会涨"。
+</div>
+
+<!-- ========== COMPETITIVE POSITIONING ========== -->
+<div class="page-break"></div>
+<h2>竞争格局</h2>
+<p>白酒行业呈现"一超（茅台）多强"格局。五粮液稳居浓香型龙头，品牌力仅次于茅台，与泸州老窖、洋河股份等同属第一梯队。行业核心壁垒在于品牌心智与渠道掌控力，而非产能。五粮液毛利率82%+，核心产品毛利率高达92%，盈利能力行业顶尖。</p>
+
+<table class="compact striped">
+  <thead>
+    <tr>
+      <th>维度</th>
+      <th>五粮液</th>
+      <th>贵州茅台</th>
+      <th>泸州老窖</th>
+      <th>洋河股份</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>香型定位</td>
+      <td><strong>浓香第一</strong></td>
+      <td>酱香第一</td>
+      <td>浓香前三</td>
+      <td>浓香前五</td>
+    </tr>
+    <tr>
+      <td>毛利率（酒类）</td>
+      <td>~82%</td>
+      <td>~91%</td>
+      <td>~88%</td>
+      <td>~75%</td>
+    </tr>
+    <tr>
+      <td>有息负债</td>
+      <td>无</td>
+      <td>无</td>
+      <td>无</td>
+      <td>无</td>
+    </tr>
+    <tr>
+      <td>现金储备</td>
+      <td>1,241亿</td>
+      <td>充裕</td>
+      <td>充裕</td>
+      <td>充裕</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ========== RISKS ========== -->
+<h2>风险提示</h2>
+<div class="risk-grid">
+  <div class="risk-item">
+    <div class="risk-label">🔴 估值过高</div>
+    <div class="risk-desc">按2024正常利润PE 10.4倍处于边界；按2025年利润则37倍极高。当前股价已price in较强恢复预期。</div>
+  </div>
+  <div class="risk-item">
+    <div class="risk-label">🔴 行业调整持续</div>
+    <div class="risk-desc">白酒行业深度调整，政商务需求低迷，渠道库存去化尚未完成。恢复节奏不明朗。</div>
+  </div>
+  <div class="risk-item">
+    <div class="risk-label">🟡 批价下行风险</div>
+    <div class="risk-desc">普五批价若下行，渠道利润压缩，可能触发降价去库存的恶性循环。</div>
+  </div>
+  <div class="risk-item">
+    <div class="risk-label">🟡 长期消费结构变化</div>
+    <div class="risk-desc">年轻人白酒消费下降是长期结构性风险，短期难证伪，需持续跟踪。</div>
+  </div>
+</div>
+
+<!-- ========== DECISION ========== -->
+<h2>决策与持仓管理</h2>
+<table class="financial striped">
+  <thead>
+    <tr>
+      <th>项目</th>
+      <th>结论</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>当前状态</td>
+      <td><span class="tag">🔴 明确不买入</span></td>
+    </tr>
+    <tr>
+      <td>建议仓位</td>
+      <td><strong>0%</strong></td>
+    </tr>
+    <tr>
+      <td>首次建仓触发</td>
+      <td>股价跌至70元以下（按2024利润PE≈8.5倍）</td>
+    </tr>
+    <tr>
+      <td>加仓触发</td>
+      <td>股价跌至60元以下（按2024利润PE≈7.3倍）</td>
+    </tr>
+    <tr>
+      <td>观望纪律</td>
+      <td>表面PE(当年)&gt;15倍继续观望；&lt;10倍启动分析；&lt;8倍考虑试探建仓（2-3%）</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ========== ANALYST SUMMARY ========== -->
+<div class="analyst-box">
+  <div class="analyst-label">分析师总结</div>
+  <p>五粮液是顶级的消费品资产：浓香型绝对龙头、品牌护城河极厚、现金1,241亿、无有息负债、毛利率82%+、连续28年分红。但<strong>好公司≠好价格</strong>。V5.5.20框架下，即使按2024年正常利润计算，表面PE 10.4倍也仅处硬约束边界，不满足&lt;10倍的买入标准；TTM 26.3倍与2025年静态37倍均严重超标。</p>
+  <p>白酒行业仍在调整期，2025年会计出清后恢复节奏不明朗。当前市值3,313亿需要利润恢复至340亿以上才能支撑PE&lt;10倍（超过2024年水平），即股价已隐含较强复苏预期。<strong>建议放入观察列表，等待股价跌至70元以下（PE&lt;10倍）再启动深度评估。</strong>宁可持币错过，也不凭净现金安全垫勉强介入。</p>
+</div>
+
+<!-- ========== FOOTER ========== -->
+<div class="report-footer">
+  <span>本分析基于公开信息与V5.5.20投资模板框架，仅供参考，不构成投资建议。</span>
+  <span>investTemplate · 2026-05-21</span>
+</div>
+
+</body>
+</html>

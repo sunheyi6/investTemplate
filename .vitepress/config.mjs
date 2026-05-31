@@ -63,6 +63,7 @@ export default defineConfig({
           { text: '09-估值修复框架', link: '/template/09-估值修复框架' },
           { text: '10-特殊轻资产模式', link: '/template/10-特殊轻资产模式' },
           { text: '12-扩张期消费品牌分析框架', link: '/template/12-扩张期消费品牌分析框架' },
+          { text: '13-消费分层与AI时代防御框架', link: '/template/13-消费分层与AI时代防御框架' },
           { text: '11-ST套利与特殊事件策略', link: '/template/11-ST套利与特殊事件策略' }
         ]
       },
@@ -96,7 +97,8 @@ export default defineConfig({
           { text: '华润医药_03320_投资分析报告', link: '/analysis-reports/华润医药_03320_投资分析报告' },
           { text: '中国食品_00506_投资分析报告', link: '/analysis-reports/中国食品_00506_投资分析报告' },
           { text: '达势股份_01405_投资分析报告', link: '/analysis-reports/达势股份_01405_投资分析报告' },
-          { text: '山东药玻_600529_投资分析报告', link: '/analysis-reports/山东药玻_600529_投资分析报告' }
+          { text: '山东药玻_600529_投资分析报告', link: '/analysis-reports/山东药玻_600529_投资分析报告' },
+          { text: '五粮液_000858_投资分析报告', link: '/analysis-reports/五粮液_000858_投资分析报告' }
         ]
       }
       ]
