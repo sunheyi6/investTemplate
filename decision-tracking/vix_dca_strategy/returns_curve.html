@@ -36,13 +36,13 @@
       <button class="period-tab" data-period="year" onclick="switchPeriod('year')">年</button>
     </div>
   </div>
-  <div class="chart-subtitle">鼠标悬停查看详细数据 | 最后更新: 2026-05-29</div>
+  <div class="chart-subtitle">鼠标悬停查看详细数据 | 最后更新: 2026-06-01</div>
   <div id="truncation-notice" style="display:none; font-size:12px; color:#d97706; margin-bottom:8px; padding:6px 10px; background:#fffbeb; border-radius:4px; border:1px solid #fcd34d;"></div>
   <div id="chart"></div>
   <div class="stats-bar">
     <div class="stat-item">
       <div class="stat-label">累计收益率</div>
-      <div class="stat-value positive">+23.03%</div>
+      <div class="stat-value positive">+22.98%</div>
     </div>
     <div class="stat-item">
       <div class="stat-label">最新价格</div>
@@ -50,7 +50,7 @@
     </div>
     <div class="stat-item">
       <div class="stat-label">最新VIX</div>
-      <div class="stat-value">15.81</div>
+      <div class="stat-value">15.82</div>
     </div>
     <div class="stat-item">
       <div class="stat-label">持仓市值</div>
@@ -63,7 +63,7 @@
   </div>
 </div>
 <script>
-  var rawData = [{"date": "2026-03-24", "price": 1.952, "vix": 26.95, "market_value": 3006.08, "unrealized_pnl": 7.4, "daily_pnl": 7.4, "total_return_pct": 0.25}, {"date": "2026-03-25", "price": 1.965, "vix": 25.33, "market_value": 3026.1, "unrealized_pnl": 27.42, "daily_pnl": 20.02, "total_return_pct": 0.91}, {"date": "2026-03-26", "price": 1.947, "vix": 27.44, "market_value": 2998.38, "unrealized_pnl": -0.3, "daily_pnl": -27.72, "total_return_pct": -0.01}, {"date": "2026-03-27", "price": 1.933, "vix": 31.05, "market_value": 2976.82, "unrealized_pnl": -21.86, "daily_pnl": -21.56, "total_return_pct": -0.73}, {"date": "2026-03-30", "price": 1.902, "vix": 30.61, "market_value": 2929.08, "unrealized_pnl": -69.6, "daily_pnl": -47.74, "total_return_pct": -2.32}, {"date": "2026-03-31", "price": 1.887, "vix": 25.25, "market_value": 2905.98, "unrealized_pnl": -92.7, "daily_pnl": -23.1, "total_return_pct": -3.09}, {"date": "2026-04-01", "price": 1.968, "vix": 24.54, "market_value": 3030.72, "unrealized_pnl": 32.04, "daily_pnl": 124.74, "total_return_pct": 1.07}, {"date": "2026-04-02", "price": 1.939, "vix": 23.87, "market_value": 2986.06, "unrealized_pnl": -12.62, "daily_pnl": -44.66, "total_return_pct": -0.42}, {"date": "2026-04-03", "price": 1.945, "vix": null, "market_value": 2995.3, "unrealized_pnl": -3.38, "daily_pnl": 9.24, "total_return_pct": -0.11}, {"date": "2026-04-07", "price": 1.952, "vix": 25.78, "market_value": 4505.22, "unrealized_pnl": 7.25, "daily_pnl": 10.63, "total_return_pct": 0.16}, {"date": "2026-04-08", "price": 2.045, "vix": 21.04, "market_value": 4719.86, "unrealized_pnl": 221.89, "daily_pnl": 214.64, "total_return_pct": 4.93}, {"date": "2026-04-09", "price": 2.026, "vix": 19.49, "market_value": 4676.01, "unrealized_pnl": 178.04, "daily_pnl": -43.85, "total_return_pct": 3.96}, {"date": "2026-04-10", "price": 2.038, "vix": 19.23, "market_value": 4703.7, "unrealized_pnl": 205.73, "daily_pnl": 27.7, "total_return_pct": 4.57}, {"date": "2026-04-13", "price": 2.028, "vix": 19.12, "market_value": 4680.62, "unrealized_pnl": 182.65, "daily_pnl": -23.08, "total_return_pct": 4.06}, {"date": "2026-04-14", "price": 2.064, "vix": 18.36, "market_value": 4763.71, "unrealized_pnl": 265.74, "daily_pnl": 83.09, "total_return_pct": 5.91}, {"date": "2026-04-15", "price": 2.1, "vix": 18.17, "market_value": 4846.8, "unrealized_pnl": 348.83, "daily_pnl": 83.09, "total_return_pct": 7.76}, {"date": "2026-04-16", "price": 2.143, "vix": 17.94, "market_value": 4946.04, "unrealized_pnl": 448.07, "daily_pnl": 99.24, "total_return_pct": 9.96}, {"date": "2026-04-17", "price": 2.128, "vix": 17.48, "market_value": 4911.42, "unrealized_pnl": 413.45, "daily_pnl": -34.62, "total_return_pct": 9.19}, {"date": "2026-04-20", "price": 2.13, "vix": 18.87, "market_value": 4916.04, "unrealized_pnl": 418.07, "daily_pnl": 4.62, "total_return_pct": 9.29}, {"date": "2026-04-21", "price": 2.133, "vix": 19.5, "market_value": 6872.53, "unrealized_pnl": 424.8, "daily_pnl": 6.73, "total_return_pct": 6.59}, {"date": "2026-04-22", "price": 2.141, "vix": 18.92, "market_value": 6898.3, "unrealized_pnl": 450.57, "daily_pnl": 25.78, "total_return_pct": 6.99}, {"date": "2026-04-23", "price": 2.15, "vix": 19.31, "market_value": 6927.3, "unrealized_pnl": 479.57, "daily_pnl": 29.0, "total_return_pct": 7.44}, {"date": "2026-04-24", "price": 2.157, "vix": 18.71, "market_value": 6949.85, "unrealized_pnl": 502.12, "daily_pnl": 22.55, "total_return_pct": 7.79}, {"date": "2026-04-27", "price": 2.196, "vix": 18.02, "market_value": 7075.51, "unrealized_pnl": 627.78, "daily_pnl": 125.66, "total_return_pct": 9.74}, {"date": "2026-04-28", "price": 2.197, "vix": 17.83, "market_value": 7078.73, "unrealized_pnl": 631.0, "daily_pnl": 3.22, "total_return_pct": 9.79}, {"date": "2026-04-29", "price": 2.188, "vix": 18.81, "market_value": 7049.74, "unrealized_pnl": 602.01, "daily_pnl": -29.0, "total_return_pct": 9.34}, {"date": "2026-04-30", "price": 2.196, "vix": 16.89, "market_value": 7075.51, "unrealized_pnl": 627.78, "daily_pnl": 25.78, "total_return_pct": 9.74}, {"date": "2026-05-06", "price": 2.27, "vix": 17.39, "market_value": 7313.94, "unrealized_pnl": 866.21, "daily_pnl": 238.43, "total_return_pct": 13.43}, {"date": "2026-05-07", "price": 2.315, "vix": 17.08, "market_value": 7458.93, "unrealized_pnl": 1011.2, "daily_pnl": 144.99, "total_return_pct": 15.68}, {"date": "2026-05-08", "price": 2.318, "vix": 17.19, "market_value": 7468.6, "unrealized_pnl": 1020.87, "daily_pnl": 9.67, "total_return_pct": 15.83}, {"date": "2026-05-11", "price": 2.378, "vix": 18.38, "market_value": 7661.92, "unrealized_pnl": 1214.19, "daily_pnl": 193.32, "total_return_pct": 18.83}, {"date": "2026-05-12", "price": 2.348, "vix": 17.99, "market_value": 7565.26, "unrealized_pnl": 1117.53, "daily_pnl": -96.66, "total_return_pct": 17.33}, {"date": "2026-05-13", "price": 2.36, "vix": 17.87, "market_value": 7603.92, "unrealized_pnl": 1156.19, "daily_pnl": 38.66, "total_return_pct": 17.93}, {"date": "2026-05-14", "price": 2.371, "vix": 17.26, "market_value": 7639.36, "unrealized_pnl": 1191.63, "daily_pnl": 35.44, "total_return_pct": 18.48}, {"date": "2026-05-15", "price": 2.355, "vix": 18.43, "market_value": 7587.81, "unrealized_pnl": 1140.08, "daily_pnl": -51.55, "total_return_pct": 17.68}, {"date": "2026-05-18", "price": 2.312, "vix": 17.82, "market_value": 7449.26, "unrealized_pnl": 1001.53, "daily_pnl": -138.55, "total_return_pct": 15.53}, {"date": "2026-05-19", "price": 2.306, "vix": 18.06, "market_value": 9378.5, "unrealized_pnl": 982.01, "daily_pnl": -19.52, "total_return_pct": 11.7}, {"date": "2026-05-20", "price": 2.317, "vix": 17.44, "market_value": 9423.24, "unrealized_pnl": 1026.75, "daily_pnl": 44.74, "total_return_pct": 12.23}, {"date": "2026-05-21", "price": 2.346, "vix": 16.76, "market_value": 9541.18, "unrealized_pnl": 1144.69, "daily_pnl": 117.94, "total_return_pct": 13.63}, {"date": "2026-05-22", "price": 2.379, "vix": 16.7, "market_value": 9675.39, "unrealized_pnl": 1278.9, "daily_pnl": 134.21, "total_return_pct": 15.23}, {"date": "2026-05-25", "price": 2.477, "vix": 16.59, "market_value": 10073.96, "unrealized_pnl": 1677.47, "daily_pnl": 398.57, "total_return_pct": 19.98}, {"date": "2026-05-26", "price": 2.442, "vix": 17.01, "market_value": 9931.61, "unrealized_pnl": 1535.12, "daily_pnl": -142.34, "total_return_pct": 18.28}, {"date": "2026-05-27", "price": 2.49, "vix": 16.29, "market_value": 10126.83, "unrealized_pnl": 1730.34, "daily_pnl": 195.22, "total_return_pct": 20.61}, {"date": "2026-05-28", "price": 2.468, "vix": 15.74, "market_value": 10037.36, "unrealized_pnl": 1640.87, "daily_pnl": -89.47, "total_return_pct": 19.54}, {"date": "2026-05-29", "price": 2.54, "vix": 15.81, "market_value": 10330.18, "unrealized_pnl": 1933.69, "daily_pnl": 292.82, "total_return_pct": 23.03}];
+  var rawData = [{"date": "2026-03-24", "total_return_pct": -0.0, "daily_pnl": -0.3, "price": 1.947, "vix": 21.0, "market_value": 2998.38, "unrealized_pnl": -0.3}, {"date": "2026-04-07", "total_return_pct": 0.01, "daily_pnl": 7.55, "price": 1.952, "vix": 19.5, "market_value": 4505.22, "unrealized_pnl": 7.25}, {"date": "2026-04-21", "total_return_pct": 0.42, "daily_pnl": 417.55, "price": 2.133, "vix": 19.5, "market_value": 6872.53, "unrealized_pnl": 424.8}, {"date": "2026-05-19", "total_return_pct": 0.98, "daily_pnl": 557.21, "price": 2.306, "vix": 18.15, "market_value": 9378.5, "unrealized_pnl": 982.01}, {"date": "2026-05-28", "total_return_pct": 1.64, "daily_pnl": 0.0, "price": 2.468, "vix": 16.72, "market_value": 10037.36, "unrealized_pnl": 1640.87}, {"date": "2026-05-29", "total_return_pct": 1.93, "daily_pnl": 292.82, "price": 2.54, "vix": 15.84, "market_value": 10330.18, "unrealized_pnl": 1933.69}, {"date": "2026-06-01", "total_return_pct": 22.98, "daily_pnl": 0.0, "price": 2.54, "vix": 15.82, "market_value": 10330.18, "unrealized_pnl": 1933.69}];
   var chart = echarts.init(document.getElementById('chart'));
   var currentPeriod = 'day';
 
@@ -84,6 +84,7 @@
     return d.getFullYear() + '-W' + String(weekNo).padStart(2, '0');
   }
 
+  // 各周期最大显示限制（超过则截断并提示）
   var PERIOD_LIMITS = { day: 180, week: 52, month: 24, year: Infinity };
 
   function aggregateData(period) {
@@ -110,11 +111,21 @@
         data.push(groups[sortedKeys[k]]);
       }
     }
+
+    // 应用最大限制截断
     var limit = PERIOD_LIMITS[period];
     if (data.length > limit) {
       return { data: data.slice(data.length - limit), truncated: true, total: data.length, shown: limit };
     }
     return { data: data, truncated: false, total: data.length, shown: data.length };
+  }
+
+  function getPeriodLabel(period) {
+    if (period === 'day') return '日';
+    if (period === 'week') return '周';
+    if (period === 'month') return '月';
+    if (period === 'year') return '年';
+    return period;
   }
 
   function renderChart(period) {
@@ -128,10 +139,12 @@
     var marketValues = data.map(function(d) { return d.market_value; });
     var unrealizedPnls = data.map(function(d) { return d.unrealized_pnl; });
 
+    // 截断提示
     var noticeEl = document.getElementById('truncation-notice');
     if (result.truncated) {
       var nextPeriod = { day: '周', week: '月', month: '年' };
-      noticeEl.innerHTML = '<span style="color:#d97706;">⚠️ 数据量较大（共' + result.total + '条），当前仅显示最近' + result.shown + '条。建议切换到 <strong>' + nextPeriod[period] + '</strong> 模式查看全部历史 →</span>';
+      noticeEl.innerHTML = '<span style="color:#d97706;">⚠️ 数据量较大（共' + result.total + '条），当前仅显示最近' + result.shown + '条。' +
+        '建议切换到 <strong>' + nextPeriod[period] + '</strong> 模式查看全部历史 →</span>';
       noticeEl.style.display = 'block';
     } else {
       noticeEl.style.display = 'none';
