@@ -99,10 +99,13 @@ grep -q "recent_actions" public/dashboard/dashboard_snapshot.json && echo "OK" |
 
 **必须同步更新**：
 ```
-1️⃣ 08-决策追踪/vix_dca_strategy/daily_snapshot.csv  (每日收益)
-2️⃣ 08-决策追踪/vix_dca_strategy/state.json           (当前状态)
-3️⃣ 模拟持仓/VIX定投策略.md                          (网页展示页面) ⭐易遗漏！
-4️⃣ public/vix_strategy/dashboard_data.json           (网页数据源) ⭐易遗漏！
+1️⃣ decision-tracking/vix_dca_strategy/daily_snapshot.csv  (每日收益)
+2️⃣ decision-tracking/vix_dca_strategy/state.json           (当前状态)
+3️⃣ decision-tracking/vix_dca_strategy/daily_returns.csv    (收益率曲线数据源)
+4️⃣ portfolio/vix-dca-strategy.md                          (网页展示页面) ⭐易遗漏！
+5️⃣ public/vix_strategy/dashboard_data.json                (网页数据源) ⭐易遗漏！
+6️⃣ public/vix_strategy/returns_curve.html                 (收益率曲线) ⭐易遗漏！
+7️⃣ 08-决策追踪/vix_dca_strategy/*                         (旧目录同步)
 ```
 
 **更新后验证**：
@@ -154,6 +157,9 @@ python scripts/validate_simulation_data.py
 
 # 验证PE计算（防止市值误算，V5.5.20新增）
 python scripts/validate_pe_calculation.py 06049 --price 30.56 --shares 5.5333 --profit 15.50 --currency HKD
+
+# 验证VIX定投策略数据一致性（V5.5.21新增）
+python scripts/validate_vix_dca.py
 
 # 本地预览
 npm run docs:dev
@@ -298,11 +304,51 @@ npm run docs:dev
 - [ ] public/vix_strategy/dashboard_data.json 已同步
 - [ ] **returns_curve.html 已重新生成并与数据一致** ⭐易遗漏！
 - [ ] returns_curve.svg 已同步更新（如需要）
+- [ ] **运行 `python scripts/validate_vix_dca.py` 校验通过** ⭐新增！
 
 ---
 
-**版本**: V5.5.20+TTM PE 表面估值优先修正版  
-**最后更新**: 2026-05-29
+### 案例4：VIX定投策略收益率口径不一致（2026-06-01）⭐⭐⭐⭐⭐
+
+**错误描述**：
+`daily_returns.csv` 和 `returns_curve.html` 中，2026-05-29及之前的 `total_return_pct` 错误地基于 `initial_capital=100000` 计算（如1.93%），而2026-06-01突然变成基于 `total_invested=8400` 计算（22.98%）。收益率曲线出现从1.93%到22.98%的剧烈垂直跳变，且 `state.json` 缺少 `capital_mode` 字段导致脚本行为不可预测。
+
+**错误数据**：
+- 收益率曲线：2026-05-29显示+1.93%，2026-06-01突然跳变为+22.98%
+- `daily_returns.csv` 中 `net_value` 口径混乱（有时含cash，有时不含）
+- `08-决策追踪/` 目录数据完全过时，与 `decision-tracking/` 不一致
+- `daily_snapshot.csv` 只有1条旧记录，与当前持仓严重不符
+
+**根本原因**：
+1. ❌ `state.json` 缺少 `capital_mode` 字段，脚本 `get_tracking_principal()` 行为随代码迭代发生变化
+2. ❌ 历史数据的 `total_return_pct` 基于总预算100000计算，后改为基于实际投入8400计算，未追溯修正
+3. ❌ `daily_returns.csv` 和 `returns_curve.html` 的 `rawData` 未同步更新
+4. ❌ `decision-tracking/` 与 `08-决策追踪/` 两个目录数据各自为政
+5. ❌ 没有自动化校验脚本，数据错误无法及时发现
+
+**影响**：
+- 收益率曲线自相矛盾，前端展示出现断崖式跳变
+- 同一策略在不同文件中呈现不同收益率
+- 用户指出数据异常后，需逐文件排查修复，效率极低
+
+**预防措施**：
+- ✅ **`state.json` 必须显式设置 `capital_mode`**（建议 `"dca"`），确保收益率基于累计投入计算
+- ✅ **统一收益率口径**：`total_return_pct` 始终基于 historical `cumulative_buy` 计算
+- ✅ **`net_value` 统一为 `market_value`**（只展示持仓市值，不包含现金）
+- ✅ **废弃或同步 `08-决策追踪/` 目录**，以 `decision-tracking/` 为唯一真相源
+- ✅ **新增校验脚本**：`python scripts/validate_vix_dca.py` 每次更新后必运行
+
+**检查清单（更新VIX策略数据时）**：
+- [ ] `state.json` 包含 `"capital_mode": "dca"`
+- [ ] `daily_returns.csv` 中 `total_return_pct` 与 `return_pct` 差异<0.1%
+- [ ] `returns_curve.html` 的 `rawData` 与 `daily_returns.csv` 完全一致
+- [ ] `decision-tracking/` 与 `08-决策追踪/` 数据同步
+- [ ] **运行 `python scripts/validate_vix_dca.py` 零错误通过**
+
+---
+
+**版本**: V5.5.21+VIX数据一致性修正版  
+**最后更新**: 2026-06-02
 
 ---
 
