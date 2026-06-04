@@ -36,7 +36,7 @@
       <button class="period-tab" data-period="year" onclick="switchPeriod('year')">年</button>
     </div>
   </div>
-  <div class="chart-subtitle">鼠标悬停查看详细数据 | 最后更新: 2026-06-03</div>
+  <div class="chart-subtitle">鼠标悬停查看详细数据 | 最后更新: 2026-06-04</div>
   <div id="truncation-notice" style="display:none; font-size:12px; color:#d97706; margin-bottom:8px; padding:6px 10px; background:#fffbeb; border-radius:4px; border:1px solid #fcd34d;"></div>
   <div id="chart"></div>
   <div class="stats-bar">
@@ -50,7 +50,7 @@
     </div>
     <div class="stat-item">
       <div class="stat-label">最新VIX</div>
-      <div class="stat-value">16.04</div>
+      <div class="stat-value">16.6</div>
     </div>
     <div class="stat-item">
       <div class="stat-label">持仓市值</div>
@@ -63,7 +63,7 @@
   </div>
 </div>
 <script>
-  var rawData = [{"date": "2026-03-24", "total_return_pct": -0.05, "daily_pnl": -0.3, "price": 1.947, "vix": 21.0, "market_value": 2998.38, "unrealized_pnl": -0.3}, {"date": "2026-04-07", "total_return_pct": 0.12, "daily_pnl": 7.55, "price": 1.952, "vix": 19.5, "market_value": 4505.22, "unrealized_pnl": 7.25}, {"date": "2026-04-21", "total_return_pct": 6.55, "daily_pnl": 417.55, "price": 2.133, "vix": 19.5, "market_value": 6872.53, "unrealized_pnl": 424.8}, {"date": "2026-05-19", "total_return_pct": 11.65, "daily_pnl": 557.21, "price": 2.306, "vix": 18.15, "market_value": 9378.5, "unrealized_pnl": 982.01}, {"date": "2026-05-28", "total_return_pct": 19.49, "daily_pnl": 658.86, "price": 2.468, "vix": 16.72, "market_value": 10037.36, "unrealized_pnl": 1640.87}, {"date": "2026-05-29", "total_return_pct": 22.98, "daily_pnl": 292.82, "price": 2.54, "vix": 15.84, "market_value": 10330.18, "unrealized_pnl": 1933.69}, {"date": "2026-06-01", "total_return_pct": 22.98, "daily_pnl": 0.0, "price": 2.54, "vix": 15.82, "market_value": 10330.18, "unrealized_pnl": 1933.69}, {"date": "2026-06-02", "total_return_pct": 22.48, "daily_pnl": 252.02, "price": 2.602, "vix": 16.12, "market_value": 11880.73, "unrealized_pnl": 2185.71}, {"date": "2026-06-03", "total_return_pct": 22.48, "daily_pnl": 0.0, "price": 2.602, "vix": 16.04, "market_value": 11880.73, "unrealized_pnl": 2185.71}];
+  var rawData = [{"date": "2026-03-24", "total_return_pct": -0.05, "daily_pnl": -0.3, "price": 1.947, "vix": 21.0, "market_value": 2998.38, "unrealized_pnl": -0.3}, {"date": "2026-04-07", "total_return_pct": 0.12, "daily_pnl": 7.55, "price": 1.952, "vix": 19.5, "market_value": 4505.22, "unrealized_pnl": 7.25}, {"date": "2026-04-21", "total_return_pct": 6.55, "daily_pnl": 417.55, "price": 2.133, "vix": 19.5, "market_value": 6872.53, "unrealized_pnl": 424.8}, {"date": "2026-05-19", "total_return_pct": 11.65, "daily_pnl": 557.21, "price": 2.306, "vix": 18.15, "market_value": 9378.5, "unrealized_pnl": 982.01}, {"date": "2026-05-28", "total_return_pct": 19.49, "daily_pnl": 658.86, "price": 2.468, "vix": 16.72, "market_value": 10037.36, "unrealized_pnl": 1640.87}, {"date": "2026-05-29", "total_return_pct": 22.98, "daily_pnl": 292.82, "price": 2.54, "vix": 15.84, "market_value": 10330.18, "unrealized_pnl": 1933.69}, {"date": "2026-06-01", "total_return_pct": 22.98, "daily_pnl": 0.0, "price": 2.54, "vix": 15.82, "market_value": 10330.18, "unrealized_pnl": 1933.69}, {"date": "2026-06-02", "total_return_pct": 22.48, "daily_pnl": 252.02, "price": 2.602, "vix": 16.12, "market_value": 11880.73, "unrealized_pnl": 2185.71}, {"date": "2026-06-03", "total_return_pct": 22.48, "daily_pnl": 0.0, "price": 2.602, "vix": 16.04, "market_value": 11880.73, "unrealized_pnl": 2185.71}, {"date": "2026-06-04", "total_return_pct": 22.48, "daily_pnl": 0.0, "price": 2.602, "vix": 16.6, "market_value": 11880.73, "unrealized_pnl": 2185.71}];
   var chart = echarts.init(document.getElementById('chart'));
   var currentPeriod = 'day';
 
