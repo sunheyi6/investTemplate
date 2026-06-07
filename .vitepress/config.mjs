@@ -99,7 +99,8 @@ export default defineConfig({
           { text: '达势股份_01405_投资分析报告', link: '/analysis-reports/达势股份_01405_投资分析报告' },
           { text: '山东药玻_600529_投资分析报告', link: '/analysis-reports/山东药玻_600529_投资分析报告' },
           { text: '五粮液_000858_投资分析报告', link: '/analysis-reports/五粮液_000858_投资分析报告' },
-          { text: '安井食品_603345_投资分析报告', link: '/analysis-reports/安井食品_603345_投资分析报告' }
+          { text: '安井食品_603345_投资分析报告', link: '/analysis-reports/安井食品_603345_投资分析报告' },
+          { text: '滨江服务_03316_投资分析报告', link: '/analysis-reports/滨江服务_03316_投资分析报告' }
         ]
       }
       ]
