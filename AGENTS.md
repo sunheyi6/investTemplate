@@ -84,9 +84,9 @@
 **必须同时更新以下4个文件**：
 
 ```
-1️⃣ 08-决策追踪/simulation_trades.csv      (唯一真相源)
-2️⃣ 08-决策追踪/simulation_state.json       (运行时状态)
-3️⃣ 08-决策追踪/dashboard_snapshot.json     (决策追踪目录)
+1️⃣ decision-tracking/simulation_trades.csv      (唯一真相源)
+2️⃣ decision-tracking/simulation_state.json       (运行时状态)
+3️⃣ decision-tracking/dashboard_snapshot.json     (决策追踪目录)
 4️⃣ public/dashboard/dashboard_snapshot.json  (VitePress网页数据源) ⭐易遗漏！
 ```
 
@@ -154,6 +154,15 @@ cd 01-筛选框架 && python hk_stock_screener.py
 
 # 验证模拟持仓数据
 python scripts/validate_simulation_data.py
+
+# 每日工作流（AI驱动，dry-run预演模式）
+python scripts/run_daily_workflow.py --dry-run
+
+# 每日工作流（全自动执行）
+python scripts/run_daily_workflow.py
+
+# 回滚最近N笔交易
+python scripts/rollback_trade.py --last 1
 
 # 验证PE计算（防止市值误算，V5.5.20新增）
 python scripts/validate_pe_calculation.py 06049 --price 30.56 --shares 5.5333 --profit 15.50 --currency HKD

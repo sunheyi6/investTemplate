@@ -180,7 +180,12 @@ def check_daily_snapshot():
     """校验3: daily_snapshot.csv 数据完整性"""
     print("\n【校验3】daily_snapshot.csv 数据完整性")
 
-    snap_rows = load_csv_rows(STRATEGY_DIR / "daily_snapshot.csv")
+    snapshot_path = STRATEGY_DIR / "daily_snapshot.csv"
+    if not snapshot_path.exists():
+        error(f"缺少必需文件: {snapshot_path.relative_to(ROOT)}")
+        return
+
+    snap_rows = load_csv_rows(snapshot_path)
     ret_rows = load_csv_rows(STRATEGY_DIR / "daily_returns.csv")
 
     if len(snap_rows) < len(ret_rows):
@@ -272,10 +277,16 @@ def check_alt_dir_sync():
     print("\n【校验5】decision-tracking/ ↔ 08-决策追踪/ 目录同步")
 
     files_to_check = ['state.json', 'daily_snapshot.csv', 'dashboard_data.json']
+    has_sync_issue = False
     for fname in files_to_check:
         main_path = STRATEGY_DIR / fname
         alt_path = ALT_DIR / fname
+        if not main_path.exists():
+            has_sync_issue = True
+            error(f"decision-tracking/ 缺少文件: {fname}")
+            continue
         if not alt_path.exists():
+            has_sync_issue = True
             warn(f"08-决策追踪/ 缺少文件: {fname}")
             continue
         if fname.endswith('.json'):
@@ -289,6 +300,7 @@ def check_alt_dir_sync():
                 keys = []
             for k, m, a in keys:
                 if m != a:
+                    has_sync_issue = True
                     error(f"{fname} 不同步: {k} (主={m}, 旧={a})")
         else:
             with open(main_path, 'r', encoding='utf-8') as f:
@@ -296,9 +308,10 @@ def check_alt_dir_sync():
             with open(alt_path, 'r', encoding='utf-8') as f:
                 alt_content = f.read()
             if main_content != alt_content:
+                has_sync_issue = True
                 error(f"{fname} 内容不同步")
 
-    if not any('不同步' in e for e in ERRORS):
+    if not has_sync_issue:
         ok("decision-tracking/ 与 08-决策追踪/ 数据同步")
 
 

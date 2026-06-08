@@ -1,0 +1,10 @@
+# 模拟投资组合每日工作流依赖
+# 安装方式: pip install -r requirements.txt
+
+# 行情数据源（至少安装一个）
+akshare>=1.14.0
+yfinance>=0.2.0
+
+# AI LLM 调用（可选，如果不用 AI 决策则不需要）
+# openai
+# anthropic

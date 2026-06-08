@@ -41,6 +41,13 @@ __pycache__/
 # 但模拟组合的交易记录必须提交（作为真相源）
 !08-决策追踪/simulation_trades.csv
 
+# VIX定投策略的历史数据必须提交（CI校验与网页曲线依赖）
+!decision-tracking/vix_dca_strategy/daily_snapshot.csv
+!decision-tracking/vix_dca_strategy/daily_returns.csv
+!08-决策追踪/vix_dca_strategy/daily_snapshot.csv
+!08-决策追踪/vix_dca_strategy/daily_returns.csv
+!public/vix_strategy/daily_returns.csv
+
 # 临时文件
 tmp/
 temp/

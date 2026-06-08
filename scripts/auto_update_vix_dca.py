@@ -18,6 +18,7 @@ VIX定投策略自动更新脚本 V2.0
 import json
 import csv
 import argparse
+import shutil
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -1767,9 +1768,19 @@ def sync_to_public(state, dashboard):
 
     # 同步到 08-决策追踪 目录（数据一致性要求）
     if ALT_STRATEGY_DIR.exists():
+        alt_state = ALT_STRATEGY_DIR / "state.json"
+        save_json(alt_state, state)
+        print(f"[同步] 已同步到: {alt_state}")
+
         alt_dashboard = ALT_STRATEGY_DIR / "dashboard_data.json"
         save_json(alt_dashboard, dashboard)
         print(f"[同步] 已同步到: {alt_dashboard}")
+
+        # 同步 daily_snapshot.csv
+        alt_snapshot = ALT_STRATEGY_DIR / "daily_snapshot.csv"
+        if SNAPSHOT_FILE.exists():
+            shutil.copyfile(SNAPSHOT_FILE, alt_snapshot)
+            print(f"[同步] 已同步 daily_snapshot.csv 到: {alt_snapshot}")
 
         # 同步 daily_returns.csv
         alt_returns = ALT_STRATEGY_DIR / "daily_returns.csv"

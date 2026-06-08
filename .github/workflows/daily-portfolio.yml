@@ -1,0 +1,90 @@
+name: 模拟持仓每日工作流
+
+on:
+  # 每日定时运行（UTC 09:00 = 北京时间 17:00，港股收盘后）
+  schedule:
+    - cron: '0 9 * * 1-5'
+  # 支持手动触发
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: '预演模式（不执行交易）'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+      manual_review:
+        description: 'AI 决策等人工确认'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+jobs:
+  daily-workflow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    env:
+      # LLM 配置（从 Secrets 读取）
+      AI_PROVIDER: ${{ secrets.AI_PROVIDER }}
+      AI_API_KEY: ${{ secrets.AI_API_KEY }}
+      AI_API_BASE: ${{ secrets.AI_API_BASE }}
+      AI_MODEL: ${{ secrets.AI_MODEL }}
+      # 默认值兜底
+      AI_MAX_TOKENS: '4000'
+      AI_TEMPERATURE: '0.1'
+
+    steps:
+      - name: Checkout 代码
+        uses: actions/checkout@v4
+        with:
+          # 允许自动 commit 推送
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: 安装依赖
+        run: |
+          pip install akshare yfinance
+
+      - name: 运行每日工作流
+        run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            python scripts/run_daily_workflow.py --dry-run
+          elif [ "${{ github.event.inputs.manual_review }}" = "true" ]; then
+            python scripts/run_daily_workflow.py --manual-review
+          else
+            python scripts/run_daily_workflow.py
+          fi
+
+      - name: 检查是否有数据变更
+        id: check_changes
+        run: |
+          git add -A
+          if git diff --cached --quiet; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "今日无数据变更"
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "检测到数据变更"
+          fi
+
+      - name: 自动提交数据更新
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: 模拟持仓每日更新 $(date +%Y-%m-%d)
+
+          - 自动执行 run_daily_workflow.py
+          - 更新 trades.csv / state.json / dashboard_snapshot.json"
+          git push

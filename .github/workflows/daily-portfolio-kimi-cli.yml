@@ -1,0 +1,129 @@
+name: 模拟持仓每日工作流 (Kimi Code CLI 版)
+
+on:
+  schedule:
+    - cron: '0 9 * * 1-5'   # UTC 09:00 = 北京时间 17:00
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: '预演模式（不执行交易）'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+jobs:
+  daily-workflow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    env:
+      KIMI_API_KEY: ${{ secrets.KIMI_API_KEY }}
+
+    steps:
+      - name: Checkout 代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Node.js (Kimi Code CLI 需要 24.15.0+)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 安装 Python 依赖
+        run: |
+          pip install akshare yfinance
+
+      - name: 安装 Kimi Code CLI
+        run: |
+          npm install -g @moonshot-ai/kimi-code
+          kimi --version
+
+      - name: 配置 Kimi API Key
+        run: |
+          mkdir -p ~/.kimi-code
+          cat > ~/.kimi-code/config.toml << 'EOF'
+          [auth]
+          api_key = "${KIMI_API_KEY}"
+          EOF
+
+      - name: 阶段一：规则引擎执行 + 生成 AI 请求
+        run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            python scripts/run_daily_workflow.py --dry-run --manual-review
+          else
+            python scripts/run_daily_workflow.py --manual-review
+          fi
+
+      - name: 阶段二：Kimi Code AI 深度决策
+        if: env.KIMI_API_KEY != ''
+        run: |
+          if [ -f "decision-tracking/ai_decision_request.json" ]; then
+            echo "[AI] 检测到决策请求，调用 Kimi Code CLI (--yolo -p) 分析..."
+
+            # 构造 prompt：让 Kimi 读取请求文件和模板，输出 JSON 到文件
+            kimi --yolo -p "\
+          请作为遵循龟龟投资理论的防御型价值投资者，完成以下任务：
+
+          1. 读取文件 decision-tracking/ai_decision_request.json，获取当前分析请求
+          2. 读取文件 prompts/ai_trading_decision.md，获取分析模板和规则
+          3. 严格按照模板中的分析流程进行分析：
+             - 步骤0：框架选择（判断标的属于哪种框架类型）
+             - 步骤1：5分钟快速初筛（硬约束检查）
+             - 步骤2：商业模式-仓位上限矩阵
+             - 步骤3：估值硬约束（表面PE、TTM PE、净现金、股息率）
+             - 步骤4：风控硬约束检查
+          4. 将最终决策以严格的 JSON 格式写入 decision-tracking/ai_decision_response.json
+          5. JSON 必须包含字段：date, ticker, decision, shares, price, confidence, framework_type, business_model_rating, valuation_pe_surface, valuation_pe_ttm, cash_to_mkt_pct, dividend_yield_pct, max_position_pct, current_position_pct, risk_level, risk_checks_passed, vhsi_check_passed, reason, risk_warnings, template_version
+          6. 不要输出任何文字到 stdout，只写入文件
+            "
+
+            if [ -f "decision-tracking/ai_decision_response.json" ]; then
+              echo "[AI] 决策已生成:"
+              cat decision-tracking/ai_decision_response.json | head -20
+            else
+              echo "[ERROR] Kimi Code CLI 未生成响应文件"
+              exit 1
+            fi
+          else
+            echo "[INFO] 无 AI 决策请求，跳过 Kimi CLI 分析"
+          fi
+
+      - name: 阶段三：应用 AI 决策
+        run: |
+          if [ -f "decision-tracking/ai_decision_response.json" ]; then
+            echo "[APPLY] 应用 AI 决策响应..."
+            python scripts/run_daily_workflow.py --apply-ai-response
+          else
+            echo "[INFO] 无 AI 响应需要应用"
+          fi
+
+      - name: 检查是否有数据变更
+        id: check_changes
+        run: |
+          git add -A
+          if git diff --cached --quiet; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "今日无数据变更"
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "检测到数据变更"
+          fi
+
+      - name: 自动提交数据更新
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: 模拟持仓每日更新 $(date +%Y-%m-%d)
+
+          - 自动执行 run_daily_workflow.py
+          - Kimi Code CLI (--yolo -p) AI 决策
+          - 更新 trades.csv / state.json / dashboard_snapshot.json"
+          git push

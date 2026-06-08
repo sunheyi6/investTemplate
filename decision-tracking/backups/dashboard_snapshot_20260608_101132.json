@@ -1,9 +1,9 @@
 {
   "meta": {
     "template_version": "V5.5.22",
-    "engine_version": "V4.0",
-    "generated_at": "2026-06-08 10:12:32",
-    "latest_trade_date": "2026-06-08"
+    "engine_version": "V3.1",
+    "generated_at": "2026-06-08",
+    "latest_trade_date": "2026-03-26"
   },
   "portfolio": {
     "initial_capital": 500000.0,
@@ -113,9 +113,5 @@
       "amount": 79950.0,
       "reason": "初始建仓（3月26日收盘价）"
     }
-  ],
-  "ai_summary": {
-    "ai_decisions_today": 0,
-    "rule_decisions_today": 0
-  }
+  ]
 }

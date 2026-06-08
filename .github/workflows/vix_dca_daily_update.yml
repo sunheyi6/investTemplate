@@ -132,6 +132,7 @@ jobs:
         
         # 添加所有相关文件
         git add -A "decision-tracking/vix_dca_strategy/"
+        git add -A "08-决策追踪/vix_dca_strategy/"
         git add -A "public/vix_strategy/"
         git add -A "portfolio/vix-dca-strategy.md"
         
