@@ -100,7 +100,8 @@ export default defineConfig({
           { text: '山东药玻_600529_投资分析报告', link: '/analysis-reports/山东药玻_600529_投资分析报告' },
           { text: '五粮液_000858_投资分析报告', link: '/analysis-reports/五粮液_000858_投资分析报告' },
           { text: '安井食品_603345_投资分析报告', link: '/analysis-reports/安井食品_603345_投资分析报告' },
-          { text: '滨江服务_03316_投资分析报告', link: '/analysis-reports/滨江服务_03316_投资分析报告' }
+          { text: '滨江服务_03316_投资分析报告', link: '/analysis-reports/滨江服务_03316_投资分析报告' },
+          { text: '神威药业_02877_投资分析报告', link: '/analysis-reports/神威药业_02877_投资分析报告' }
         ]
       }
       ]
