@@ -1,37 +1,46 @@
 {
   "strategy": "VIX定投策略_纳指100",
   "version": "V2.0",
-  "last_update": "2026-06-15",
+  "last_update": "2026-06-16",
   "account": {
-    "initial_capital": 9700.0,
+    "initial_capital": 11000.0,
     "cash": 91603.51,
-    "total_assets": 11451.53
+    "total_assets": 12910.81
   },
   "position": {
     "etf_code": "513110",
     "etf_name": "纳斯达克100 ETF",
-    "shares": 4566,
-    "avg_cost": 2.123,
-    "current_price": 2.508,
-    "market_value": 11451.53,
-    "total_cost": 9695.02,
-    "unrealized_pnl": 1756.51,
-    "return_pct": 18.12
+    "shares": 5077,
+    "avg_cost": 2.166,
+    "current_price": 2.543,
+    "market_value": 12910.81,
+    "total_cost": 10994.62,
+    "unrealized_pnl": 1916.19,
+    "return_pct": 17.43
   },
   "performance": {
-    "total_pnl": 1756.51,
-    "total_return_pct": 18.06,
-    "daily_pnl": 470.3,
-    "vix": 16.3,
-    "date": "2026-06-15"
+    "total_pnl": 1916.19,
+    "total_return_pct": 17.37,
+    "daily_pnl": 159.68,
+    "vix": 16.14,
+    "date": "2026-06-16"
   },
   "schedule": {
     "frequency": "每双周周二",
-    "last_trade_date": "2026-06-02",
-    "next_trade_date": "2026-06-16",
-    "days_until_next": 1
+    "last_trade_date": "2026-06-16",
+    "next_trade_date": "2026-06-30",
+    "days_until_next": 14
   },
   "recent_trades": [
+    {
+      "date": "2026-06-16",
+      "vix": 16.3,
+      "action": "BUY",
+      "amount": 1300,
+      "shares": 511,
+      "price": 2.543,
+      "label": "小额定投(趋势修正×1.3)"
+    },
     {
       "date": "2026-06-02",
       "vix": 15.82,
@@ -79,6 +88,12 @@
     }
   ],
   "daily_snapshots": [
+    {
+      "date": "2026-06-16",
+      "price": 2.543,
+      "pnl": 1916.19,
+      "daily_pnl": 159.68
+    },
     {
       "date": "2026-06-15",
       "price": 2.508,
@@ -132,12 +147,6 @@
       "price": 2.563,
       "pnl": 2007.64,
       "daily_pnl": 292.23
-    },
-    {
-      "date": "2026-06-02",
-      "price": 2.602,
-      "pnl": 2185.71,
-      "daily_pnl": 252.02
     }
   ],
   "strategy_version": "V2.0",
