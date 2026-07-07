@@ -15,23 +15,23 @@
     "capital_mode": "dca",
     "currency": "CNY",
     "cash": 91603.51,
-    "last_update": "2026-07-06"
+    "last_update": "2026-07-07"
   },
   "position": {
     "shares": 5359,
     "avg_cost": 2.182185668968091,
     "total_cost": 11694.333,
-    "current_price": 2.45,
-    "market_value": 13129.550000000001,
-    "unrealized_pnl": 1435.2170000000006,
-    "return_pct": 12.27
+    "current_price": 2.438,
+    "market_value": 13065.242,
+    "unrealized_pnl": 1370.9089999999997,
+    "return_pct": 11.72
   },
   "daily_performance": {
-    "date": "2026-07-06",
-    "vix": 16.32,
-    "daily_pnl": 26.8,
-    "total_pnl": 1435.22,
-    "total_return_pct": 12.22
+    "date": "2026-07-07",
+    "vix": 15.86,
+    "daily_pnl": -64.31,
+    "total_pnl": 1370.91,
+    "total_return_pct": 11.67
   },
   "statistics": {
     "cumulative_buy": 11700.0,

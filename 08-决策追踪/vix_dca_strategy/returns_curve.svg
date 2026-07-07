@@ -15,10 +15,10 @@
 <line x1='70' y1='100.0' x2='860' y2='100.0' stroke='#e5e7eb' stroke-width='1' stroke-dasharray='2,2'/>
 <line x1='70' y1='40.0' x2='860' y2='40.0' stroke='#e5e7eb' stroke-width='1' stroke-dasharray='2,2'/>
 <line x1='70' y1='339.3' x2='860' y2='339.3' stroke='#9ca3af' stroke-width='1.5'/>
-  <path d='M70.0,339.9 L95.5,337.9 L121.0,261.8 L146.5,201.4 L171.9,108.5 L197.4,67.2 L222.9,67.2 L248.4,73.1 L273.9,94.8 L299.4,130.6 L324.8,150.6 L350.3,204.1 L375.8,154.5 L401.3,191.8 L426.8,204.1 L452.3,182.9 L477.7,125.5 L503.2,133.6 L528.7,133.1 L554.2,140.2 L579.7,140.2 L605.2,137.4 L630.6,182.3 L656.1,174.0 L681.6,157.1 L707.1,193.2 L732.6,186.7 L758.1,177.8 L783.5,170.8 L809.0,201.7 L834.5,197.4 L860.0,194.6 L860.0,339.3 L70.0,339.3 Z' fill='url(#areaGradient)' stroke='none'/>
-  <path d='M70.0,339.9 L95.5,337.9 L121.0,261.8 L146.5,201.4 L171.9,108.5 L197.4,67.2 L222.9,67.2 L248.4,73.1 L273.9,94.8 L299.4,130.6 L324.8,150.6 L350.3,204.1 L375.8,154.5 L401.3,191.8 L426.8,204.1 L452.3,182.9 L477.7,125.5 L503.2,133.6 L528.7,133.1 L554.2,140.2 L579.7,140.2 L605.2,137.4 L630.6,182.3 L656.1,174.0 L681.6,157.1 L707.1,193.2 L732.6,186.7 L758.1,177.8 L783.5,170.8 L809.0,201.7 L834.5,197.4 L860.0,194.6' fill='none' stroke='#16a34a' stroke-width='2.5' stroke-linejoin='round' stroke-linecap='round'/>
-  <circle cx='860.0' cy='194.6' r='5' fill='#16a34a' stroke='#ffffff' stroke-width='2'/>
-  <text x='860.0' y='182.6' text-anchor='middle' font-size='11' font-weight='bold' fill='#16a34a'>+12.22%</text>
+  <path d='M70.0,339.9 L94.7,337.9 L119.4,261.8 L144.1,201.4 L168.8,108.5 L193.4,67.2 L218.1,67.2 L242.8,73.1 L267.5,94.8 L292.2,130.6 L316.9,150.6 L341.6,204.1 L366.2,154.5 L390.9,191.8 L415.6,204.1 L440.3,182.9 L465.0,125.5 L489.7,133.6 L514.4,133.1 L539.1,140.2 L563.8,140.2 L588.4,137.4 L613.1,182.3 L637.8,174.0 L662.5,157.1 L687.2,193.2 L711.9,186.7 L736.6,177.8 L761.2,170.8 L785.9,201.7 L810.6,197.4 L835.3,194.6 L860.0,201.1 L860.0,339.3 L70.0,339.3 Z' fill='url(#areaGradient)' stroke='none'/>
+  <path d='M70.0,339.9 L94.7,337.9 L119.4,261.8 L144.1,201.4 L168.8,108.5 L193.4,67.2 L218.1,67.2 L242.8,73.1 L267.5,94.8 L292.2,130.6 L316.9,150.6 L341.6,204.1 L366.2,154.5 L390.9,191.8 L415.6,204.1 L440.3,182.9 L465.0,125.5 L489.7,133.6 L514.4,133.1 L539.1,140.2 L563.8,140.2 L588.4,137.4 L613.1,182.3 L637.8,174.0 L662.5,157.1 L687.2,193.2 L711.9,186.7 L736.6,177.8 L761.2,170.8 L785.9,201.7 L810.6,197.4 L835.3,194.6 L860.0,201.1' fill='none' stroke='#16a34a' stroke-width='2.5' stroke-linejoin='round' stroke-linecap='round'/>
+  <circle cx='860.0' cy='201.1' r='5' fill='#16a34a' stroke='#ffffff' stroke-width='2'/>
+  <text x='860.0' y='189.1' text-anchor='middle' font-size='11' font-weight='bold' fill='#16a34a'>+11.67%</text>
   <!-- Axis labels -->
 <text x='60' y='344.0' text-anchor='end' font-size='11' fill='#6b7280'>-0.1%</text>
 <text x='60' y='284.0' text-anchor='end' font-size='11' fill='#6b7280'>5.0%</text>
@@ -27,10 +27,10 @@
 <text x='60' y='104.0' text-anchor='end' font-size='11' fill='#6b7280'>20.2%</text>
 <text x='60' y='44.0' text-anchor='end' font-size='11' fill='#6b7280'>25.3%</text>
 <text x='70.0' y='360' text-anchor='middle' font-size='10' fill='#6b7280' transform='rotate(-30 70.0,360)'>2026-03-24</text>
-<text x='197.4' y='360' text-anchor='middle' font-size='10' fill='#6b7280' transform='rotate(-30 197.4,360)'>2026-05-29</text>
-<text x='324.8' y='360' text-anchor='middle' font-size='10' fill='#6b7280' transform='rotate(-30 324.8,360)'>2026-06-05</text>
-<text x='452.3' y='360' text-anchor='middle' font-size='10' fill='#6b7280' transform='rotate(-30 452.3,360)'>2026-06-12</text>
-<text x='579.7' y='360' text-anchor='middle' font-size='10' fill='#6b7280' transform='rotate(-30 579.7,360)'>2026-06-19</text>
-<text x='707.1' y='360' text-anchor='middle' font-size='10' fill='#6b7280' transform='rotate(-30 707.1,360)'>2026-06-26</text>
-<text x='834.5' y='360' text-anchor='middle' font-size='10' fill='#6b7280' transform='rotate(-30 834.5,360)'>2026-07-03</text>
+<text x='193.4' y='360' text-anchor='middle' font-size='10' fill='#6b7280' transform='rotate(-30 193.4,360)'>2026-05-29</text>
+<text x='316.9' y='360' text-anchor='middle' font-size='10' fill='#6b7280' transform='rotate(-30 316.9,360)'>2026-06-05</text>
+<text x='440.3' y='360' text-anchor='middle' font-size='10' fill='#6b7280' transform='rotate(-30 440.3,360)'>2026-06-12</text>
+<text x='563.8' y='360' text-anchor='middle' font-size='10' fill='#6b7280' transform='rotate(-30 563.8,360)'>2026-06-19</text>
+<text x='687.2' y='360' text-anchor='middle' font-size='10' fill='#6b7280' transform='rotate(-30 687.2,360)'>2026-06-26</text>
+<text x='810.6' y='360' text-anchor='middle' font-size='10' fill='#6b7280' transform='rotate(-30 810.6,360)'>2026-07-03</text>
   <text x='70' y='390' font-size='10' fill='#9ca3af'>数据来源: VIX定投策略 | 每日更新</text></svg>
