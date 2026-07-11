@@ -32,14 +32,14 @@ jobs:
         
     - name: 运行追踪脚本
       run: |
-        cd 07-标的追踪
+        cd stock-tracking
         python auto_stock_tracker.py
         
     - name: 提交追踪数据
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add 07-标的追踪/stock_data/
+        git add stock-tracking/stock_data/
         git commit -m "📊 更新每日追踪数据 $(date +'%Y-%m-%d')" || echo "No changes to commit"
         git push
         
@@ -47,7 +47,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: daily-report-${{ github.run_id }}
-        path: 07-标的追踪/stock_data/daily_report.md
+        path: stock-tracking/stock_data/daily_report.md
         
     # 暂时停用：自动创建Issue提醒（如有可买标的）
     # - name: 创建Issue提醒（如有可买标的）
@@ -55,7 +55,7 @@ jobs:
     #   with:
     #     script: |
     #       const fs = require('fs');
-    #       const reportPath = '07-标的追踪/stock_data/daily_report.md';
+    #       const reportPath = 'stock-tracking/stock_data/daily_report.md';
     #
     #       if (fs.existsSync(reportPath)) {
     #         const report = fs.readFileSync(reportPath, 'utf8');
