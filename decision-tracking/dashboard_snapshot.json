@@ -2,16 +2,16 @@
   "meta": {
     "template_version": "V5.5.12",
     "engine_version": "V3.1",
-    "generated_at": "2026-07-20 11:20:17",
-    "latest_trade_date": "2026-07-20"
+    "generated_at": "2026-07-21 10:36:32",
+    "latest_trade_date": "2026-07-21"
   },
   "portfolio": {
     "initial_capital": 500000.0,
     "cash": 104660.0,
-    "market_value": 356849.99,
-    "net_value": 461509.99,
-    "total_return_pct": -7.698,
-    "position_ratio_pct": 71.37,
+    "market_value": 339677.99,
+    "net_value": 444337.99,
+    "total_return_pct": -11.1324,
+    "position_ratio_pct": 67.9356,
     "positions": [
       {
         "name": "天津发展",
@@ -19,12 +19,12 @@
         "ticker": "0882.HK",
         "shares": 40000,
         "avg_cost": 2.55,
-        "close": 2.1,
-        "change_pct": 1.4493,
-        "market_value": 84000.0,
-        "unrealized": -18000.0,
+        "close": 2.08,
+        "change_pct": -0.9524,
+        "market_value": 83200.0,
+        "unrealized": -18800.0,
         "sell_trigger": 4.5,
-        "weight_pct": 18.2011,
+        "weight_pct": 18.7245,
         "status": "实时"
       },
       {
@@ -33,13 +33,13 @@
         "ticker": "1522.HK",
         "shares": 342000,
         "avg_cost": 0.295,
-        "close": 0.295,
-        "change_pct": 0.0,
-        "market_value": 100890.0,
-        "unrealized": 0.0,
+        "close": 0.249,
+        "change_pct": 0.4032,
+        "market_value": 85158.0,
+        "unrealized": -15732.0,
         "sell_trigger": 0.6,
-        "weight_pct": 21.8608,
-        "status": "占位"
+        "weight_pct": 19.1651,
+        "status": "实时"
       },
       {
         "name": "华润医药",
@@ -47,12 +47,12 @@
         "ticker": "3320.HK",
         "shares": 16000,
         "avg_cost": 5.278125,
-        "close": 4.81,
-        "change_pct": 2.1231,
-        "market_value": 76960.0,
-        "unrealized": -7490.0,
+        "close": 4.77,
+        "change_pct": -0.8316,
+        "market_value": 76320.0,
+        "unrealized": -8130.0,
         "sell_trigger": 9.0,
-        "weight_pct": 16.6757,
+        "weight_pct": 17.1761,
         "status": "实时"
       },
       {
@@ -62,11 +62,11 @@
         "shares": 250000,
         "avg_cost": 0.432,
         "close": 0.38,
-        "change_pct": 1.3333,
+        "change_pct": 0.0,
         "market_value": 95000.0,
         "unrealized": -13000.0,
         "sell_trigger": 1.0,
-        "weight_pct": 20.5846,
+        "weight_pct": 21.3801,
         "status": "实时"
       }
     ]
