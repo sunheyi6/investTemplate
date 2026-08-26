@@ -1,8 +1,8 @@
-schema_version: V5.5.24.2
+schema_version: V5.5.24.3
 analysis_metadata:
   stock_code: '600887'
   stock_name: 伊利股份
-  report_date: '2026-08-20'
+  report_date: '2026-08-26'
   analyst: Codex
   annual_report_year: 2025
   annual_report_date: '2026-04-30'
@@ -11,7 +11,7 @@ analysis_metadata:
   shareholder_relationship: 相互供养
   explicit_high_risk_request: false
   data_freshness_control:
-    current_date: '2026-08-20'
+    current_date: '2026-08-26'
     max_allowed_age_days: 365
   report_type: annual
   is_latest_full_year: true
@@ -21,12 +21,12 @@ analysis_metadata:
     pe_applicable: true
     fcf_applicable: true
     fcf_unavailable_reason: ''
-    price_as_of: '2026-08-20'
-    fx_as_of: '2026-08-20'
+    price_as_of: '2026-08-26'
+    fx_as_of: '2026-08-26'
     calculation_currency: RMB
     share_price_to_calculation_currency_rate: 1.0
     fx_source: 同币种，无需折算
-    ttm_period: 2025-04-01至2026-03-31
+    ttm_period: 2025-07-01至2026-06-30
     ttm_method: ANNUAL_PLUS_INTERIM
     ttm_unavailable_reason: ''
   data_confidence_level: S/B
@@ -142,19 +142,84 @@ core_financial_data:
     source: 2025_annual_report_income_statement
     page_number: 合并损益表
   - role: current_interim
-    period: 2026Q1
-    value: 5394651297.16
+    period: 2026H1
+    value: 5758628097.79
     operator: 1
     unit: RMB
-    source: 2026_quarter_report_key_financials
-    page_number: 主要财务数据
+    source: 2026_interim_report_key_financials
+    page_number: PDF第6页/报告第3页
   - role: prior_interim
-    period: 2025Q1
-    value: 4874104242.93
+    period: 2025H1
+    value: 7200477611.91
     operator: -1
     unit: RMB
-    source: 2026_quarter_report_comparative_key_financials
-    page_number: 主要财务数据
+    source: 2026_interim_report_comparative_key_financials
+    page_number: PDF第6页/报告第3页
+  impairment_breakdown:
+    total:
+      value: 2455875173.02
+      unit: RMB
+      source: 2026_interim_report_note_73
+      page_number: PDF第167页/报告第164页
+    direction_flip_after_adjustment: true
+    items:
+    - type: goodwill
+      amount: 1546544866.49
+      unit: RMB
+      source: 2026_interim_report_goodwill_note
+      page_number: PDF第143-144页/报告第140-141页
+    - type: inventory
+      amount: 907520836.34
+      unit: RMB
+      source: 2026_interim_report_note_73
+      page_number: PDF第167页/报告第164页
+    - type: fixed_asset
+      amount: 1740517.69
+      unit: RMB
+      source: 2026_interim_report_note_73
+      page_number: PDF第167页/报告第164页
+    - type: other
+      amount: 68952.50
+      unit: RMB
+      source: 2026_interim_report_note_73
+      page_number: PDF第167页/报告第164页
+  profit_quality:
+    bridge_required: true
+    reported_profit:
+      value: 5758628097.79
+      unit: RMB
+    normalized_profit:
+      value: 7305172964.28
+      unit: RMB
+    normalized_ttm_profit:
+      value: 11669861850.18
+      unit: RMB
+    normalized_ttm_pe:
+      value: 14.1468609936
+    adjustment_items:
+    - type: goodwill
+      amount: 1546544866.49
+      after_tax_amount: 1546544866.49
+      attributable_amount: 1546544866.49
+      cash_impact: none_current_period
+      recurring: false
+      add_back_allowed: true
+      rationale: 仅用于还原当期可比盈利；中报未单列税后归母影响，暂按合并报表影响全部归母的B级上限口径
+      remaining_exposure: 澳优剩余商誉596867800.31元，另保留后续现金支持和资产减值风险
+      source: 2026_interim_report_goodwill_note
+      page_number: PDF第143-144页/报告第140-141页
+    - type: inventory
+      amount: 907520836.34
+      after_tax_amount: 0
+      attributable_amount: 0
+      cash_impact: future_risk
+      recurring: true
+      add_back_allowed: false
+      rationale: 存货减值反映奶周期、售价和库存管理的经济损失，不因非现金而加回
+      remaining_exposure: 后续库存周转、售价及重复计提风险
+      source: 2026_interim_report_note_73
+      page_number: PDF第167页/报告第164页
+    conclusion: 报表归母利润同比下降20.02%；仅加回澳优商誉减值后的正常化归母利润同比约增长1.45%，存货及信用链减值不加回。
   operating_cash_flow:
     value: 14343920490.32
     unit: RMB
@@ -183,35 +248,35 @@ core_financial_data:
     page_number: 股本附注
     confidence: S
   share_price:
-    value: 25.28
+    value: 26.1
     currency: RMB
-    date: '2026-08-20'
-    source: Yahoo Finance daily chart API close
+    date: '2026-08-26'
+    source: Investing.com 2026-08-26 close
   market_cap:
-    value: 159905117661.76
+    value: 165091913408.7
     unit: RMB
     calculation: shares * price * fx
   calculated_metrics:
     immediate_net_cash:
       value: -31311412827.57
-      market_cap_ratio: -0.1958124498166569
+      market_cap_ratio: -0.18966044748615634
       notes: 现金等价物扣受限资金及全部有息/租赁负债；可用于流动性压力测试，但受营运资金、监管和少数股东约束，不能视为可立即自由分红。
     conservative_immediate_net_cash:
       value: -31311412827.57
-      market_cap_ratio: -0.1958124498166569
+      market_cap_ratio: -0.18966044748615634
       notes: 即时净现金再扣关联财务公司存款及其他低流动性现金。
     net_cash:
       value: -31311412827.57
-      market_cap_ratio: -0.1958124498166569
+      market_cap_ratio: -0.18966044748615634
       notes: 广义净现金含已核实的三个月以上定存，不等于随时可动用现金。
     fcf:
       value: 11307276333.64
     fcf_yield:
-      value: 0.07071241057811398
+      value: 0.06849077970575889
     fcf_multiple_market:
-      value: 14.141789140328182
+      value: 14.600502267590262
     fcf_multiple_ex_cash:
-      value: 16.91092751668644
+      value: 17.369636666945027
     multi_period_fcf:
       method: TWO_YEAR_AVERAGE
       periods:
@@ -220,15 +285,68 @@ core_financial_data:
       - period: 2025FY
         value: 11307276333.64
       average_value: 14534349203.03
-      market_cap_yield: 0.09089358374241559
+      market_cap_yield: 0.08803856680646525
     dividend_yield:
-      value: 0.0545886075949367
+      value: 0.0528735632183908
     static_pe:
-      value: 13.826443198378504
+      value: 14.274927510984137
     ttm_net_profit:
-      value: 12085713552.039999
+      value: 10123316983.69
     ttm_pe:
-      value: 13.230920704286339
+      value: 16.308084956213946
+    normalized_ttm_pe:
+      value: 14.1468609936
+
+credit_chain:
+  triggered: true
+  consolidated_interest_bearing_debt:
+    value: 65342789281.70
+    unit: RMB
+    source: 2026_interim_report_balance_sheet_and_debt_notes
+    page_number: PDF第49、148页/报告第46、145页
+  legal_off_balance_obligations:
+    value: 9076297500
+    unit: RMB
+    source: 2026_interim_report_guarantee_table
+    page_number: PDF第37页/报告第34页
+  related_party_loans:
+    value: 45231300
+    direction: outbound_receivable_and_factoring
+    unit: RMB
+    source: 2026_interim_report_related_party_balances
+    page_number: PDF第198页/报告第195页
+  factoring_and_microloans:
+    value: 3237791644.76
+    unit: RMB
+    source: 2026_interim_report_other_current_assets
+    page_number: PDF第127页/报告第124页
+  finance_company_deposits:
+    value: 1148993700
+    direction: deposit_liability_owed_to_youran
+    unit: RMB
+    source: 2026_interim_report_related_party_balances
+    page_number: PDF第198页/报告第195页
+  associate_or_subsidiary_debt:
+    value: 26379827900
+    unit: RMB
+    source: 2026_interim_report_youran_summary_financials
+    page_number: PDF第185页/报告第182页
+  implicit_support:
+    exists: true
+    rationale: 伊利持有优然36.07%并与其存在大额采购及产业链关系，具有商业支持动机；中报未披露为优然全部债务提供担保或资金拆借。
+  funding_cost_assessment: 2026H1财务费用-5.26亿元，表明净利息收入和融资价格有利，但不证明无债务或可无损切割。
+  solvency_and_cutoff_assessment: 伊利自身现金流稳定；优然负债未并表，已披露直接资产敞口有限，但权益投资、采购依赖及潜在新增支持构成尾部风险。
+  stress_test_completed: true
+  stress_scenarios:
+  - scenario: base
+    expected_support_loss: 0
+    unit: RMB
+    impact_on_net_cash_fcf_dividend: 不假设新增救助；持续监控90.76亿元担保、32.38亿元保理小贷资产及短债滚续。
+  - scenario: downside
+    expected_support_loss: 6201068000
+    unit: RMB
+    impact_on_net_cash_fcf_dividend: 机械组合优然权益投资全部减值、已披露直接资产敞口及存款集中提取；约为0.55倍2025年FCF，显著侵蚀合并净现金，但不是预测值。
+  conclusion: 存在信用链尾部风险，负财务费用不是偿付安全证明；优然263.80亿元负债不等于伊利法定连带债务，新增担保、贷款或注资才触发进一步损失重估。
 capital_market_nutrient_test:
   full_test_required: false
   classification: 相互供养
@@ -281,11 +399,11 @@ validation_checklist:
   item: 历史价格锚已排除
   checked: true
 confidence_downgrade_reasons:
-- 年报核心数据S级；股价和汇率为B级行情；维护性资本开支为B级区间估计。
+- 年报核心数据S级；2026H1原始数据、股价及正常化利润为B级；维护性资本开支和压力情景为B级分析口径。
 confirmation:
   i_confirm:
   - 核心年度数据来自正式年报
   - 计算过程已复核
   - 未把广义现金冒充随时可用现金
   analyst_signature: Codex
-  validation_date: '2026-08-20'
+  validation_date: '2026-08-26'

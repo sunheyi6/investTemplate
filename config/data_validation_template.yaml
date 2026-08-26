@@ -1,5 +1,5 @@
 # 数据质量硬约束模板
-schema_version: "V5.5.24.2"
+schema_version: "V5.5.24.3"
 # 每次分析前必须填写此模板，数据不通过校验则阻止生成报告
 # 
 # 使用说明：
@@ -215,10 +215,53 @@ core_financial_data:
       confidence: "S"
   
   non_recurring_items:
-    asset_impairment: 0  # 资产减值
     government_subsidy: 0  # 政府补贴
     gain_on_disposal: 0  # 出售资产收益
     total: 0  # 非经常性损益合计
+
+  # ========== 利润质量三层桥接（V5.5.24-r5）==========
+  impairment_breakdown:
+    total:
+      value: 0
+      unit: "HKD"
+      source: ""
+      page_number: 0
+    direction_flip_after_adjustment: false  # 剔除允许调整项后，利润同比方向是否反转
+    items: []
+    # 触发时逐项填写示例：
+    # - type: "goodwill"  # goodwill/inventory/receivable_credit/guarantee/factoring/microloan/fixed_asset/other
+    #   amount: 0
+    #   unit: "HKD"
+    #   source: ""
+    #   page_number: 0
+
+  profit_quality:
+    bridge_required: false  # 由校验器按减值规模/类型复核，不得自行规避
+    reported_profit:
+      value: null
+      unit: "HKD"
+    normalized_profit:
+      value: null
+      unit: "HKD"
+    normalized_ttm_profit:
+      value: null
+      unit: "HKD"
+    normalized_ttm_pe:
+      value: null
+    adjustment_items: []
+    # 触发时逐项填写示例：
+    # - type: "goodwill"
+    #   amount: 0
+    #   after_tax_amount: 0
+    #   attributable_amount: 0  # 纳入正常化利润的归母影响额；加回损失为正、剔除收益为负
+    #   cash_impact: "none_current_period"  # none_current_period/current_outflow/future_risk
+    #   recurring: false
+    #   add_back_allowed: true
+    #   rationale: ""
+    #   remaining_exposure: ""
+    #   source: ""
+    #   page_number: 0
+    conclusion: ""
   
   # ========== 现金流数据（S级强制）==========
   operating_cash_flow:
@@ -372,6 +415,11 @@ core_financial_data:
       formula: "market_cap / ttm_net_profit"
       value: null  # ttm_method=NOT_AVAILABLE时保持null
       display_value: ""
+
+    normalized_ttm_pe:
+      formula: "market_cap / profit_quality.normalized_ttm_profit"
+      value: null  # 仅利润桥接触发且TTM可计算时填写
+      display_value: ""
     
     pb_ratio:
       formula: "market_cap / net_assets"
@@ -387,6 +435,54 @@ core_financial_data:
       formula: "net_cash / market_cap"
       value: 0  # 自动计算（如0.33表示33%）
       display_value: ""
+
+# ========== 信用链穿透（V5.5.24-r5，存在敞口时强制）==========
+credit_chain:
+  triggered: false
+  consolidated_interest_bearing_debt:
+    value: 0
+    unit: "HKD"
+    source: ""
+    page_number: 0
+  legal_off_balance_obligations:
+    value: 0  # 担保、追索保理、差额补足、承诺函等
+    unit: "HKD"
+    source: ""
+    page_number: 0
+  related_party_loans:
+    value: 0
+    direction: "outbound"  # outbound/inbound
+    unit: "HKD"
+    source: ""
+    page_number: 0
+  factoring_and_microloans:
+    value: 0
+    unit: "HKD"
+    source: ""
+    page_number: 0
+  finance_company_deposits:
+    value: 0
+    direction: "held_at_group_finance_company"
+    unit: "HKD"
+    source: ""
+    page_number: 0
+  associate_or_subsidiary_debt:
+    value: 0
+    unit: "HKD"
+    source: ""
+    page_number: 0
+  implicit_support:
+    exists: false
+    rationale: ""
+  funding_cost_assessment: ""
+  solvency_and_cutoff_assessment: ""
+  stress_test_completed: false
+  stress_scenarios: []
+  # - scenario: "downside"
+  #   expected_support_loss: 0
+  #   unit: "HKD"
+  #   impact_on_net_cash_fcf_dividend: ""
+  conclusion: ""
 
 # ========== 历史数据对比（强制3年）==========
 historical_comparison:

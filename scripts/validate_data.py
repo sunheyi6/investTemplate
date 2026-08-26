@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-数据质量硬校验脚本（对应模板 V5.5.24-r2）
+数据质量硬校验脚本（对应模板 V5.5.24-r5）
 必须在生成报告前运行并通过
 
 使用方法：
@@ -33,7 +33,7 @@ class ValidationResult:
 class DataValidator:
     """数据硬校验器"""
 
-    CURRENT_SCHEMA_VERSION = "V5.5.24.2"
+    CURRENT_SCHEMA_VERSION = "V5.5.24.3"
     
     def __init__(self, data: Dict[str, Any]):
         self.data = data
@@ -65,6 +65,12 @@ class DataValidator:
         
         # 4. 利润数据校验（S级）
         self._validate_profit_data()
+
+        # 4.2 大额减值与正常化利润桥接（V5.5.24-r5）
+        self._validate_profit_quality()
+
+        # 4.3 关联融资与信用链压力测试（V5.5.24-r5）
+        self._validate_credit_chain()
 
         # 4.5 估值适用性与TTM时点校验（V5.5.23延续）
         self._validate_valuation_data()
@@ -465,6 +471,143 @@ class DataValidator:
 
         if not any(e for e in self.errors if e.startswith('[PROFIT]')):
             print(f"   [PASS] 利润数据校验通过")
+
+    @staticmethod
+    def _numeric_value(value: Any) -> float:
+        """兼容原始数字和{value: ...}字段；空值按0处理。"""
+        if isinstance(value, dict):
+            value = value.get('value')
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            return float(value)
+        return 0.0
+
+    def _validate_profit_quality(self):
+        """大额减值触发三层利润桥接，阻止把所有非现金减值机械加回。"""
+        print("\n[4.2] 利润质量三层桥接校验")
+        core = self.data.get('core_financial_data', {})
+        impairment = core.get('impairment_breakdown') or {}
+        items = impairment.get('items') or []
+        total_impairment = abs(self._numeric_value(impairment.get('total')))
+        attributable_profit = abs(self._numeric_value(core.get('net_profit_attributable')))
+        trigger_types = {'goodwill', 'receivable_credit', 'guarantee', 'factoring', 'microloan'}
+        item_types = {
+            str(item.get('type', '')).strip().lower()
+            for item in items if isinstance(item, dict) and abs(self._numeric_value(item.get('amount'))) > 0
+        }
+        ratio_trigger = attributable_profit > 0 and total_impairment / attributable_profit > 0.10
+        triggered = bool(
+            ratio_trigger
+            or impairment.get('direction_flip_after_adjustment', False)
+            or item_types.intersection(trigger_types)
+            or ('inventory' in item_types and total_impairment > 0)
+        )
+        if not triggered:
+            print("   [PASS] 未触发强制正常化利润桥接")
+            return
+
+        for index, item in enumerate(items, 1):
+            if not item.get('source'):
+                self.errors.append(f"[PROFIT_QUALITY] 第{index}项减值明细缺少source")
+            if not item.get('page_number'):
+                self.errors.append(f"[PROFIT_QUALITY] 第{index}项减值明细缺少page_number或公告章节")
+
+        quality = core.get('profit_quality') or {}
+        if not quality.get('bridge_required', False):
+            self.errors.append("[PROFIT_QUALITY] 大额/特定减值已触发，bridge_required必须为true")
+        for name in ('reported_profit', 'normalized_profit'):
+            if quality.get(name, {}).get('value') is None:
+                self.errors.append(f"[PROFIT_QUALITY] 触发后必须填写{name}.value")
+        adjustments = quality.get('adjustment_items') or []
+        if not adjustments:
+            self.errors.append("[PROFIT_QUALITY] 触发后必须逐项填写adjustment_items（包括不允许加回的项目）")
+
+        prohibited_addbacks = {'inventory', 'receivable_credit', 'guarantee', 'factoring', 'microloan'}
+        required_fields = {
+            'type', 'amount', 'after_tax_amount', 'attributable_amount', 'cash_impact',
+            'recurring', 'add_back_allowed', 'rationale', 'remaining_exposure', 'source', 'page_number'
+        }
+        for index, item in enumerate(adjustments, 1):
+            missing = [field for field in required_fields if field not in item or item.get(field) in ('', None)]
+            if missing:
+                self.errors.append(f"[PROFIT_QUALITY] 第{index}项调整缺少字段: {', '.join(missing)}")
+            if not item.get('page_number'):
+                self.errors.append(f"[PROFIT_QUALITY] 第{index}项调整缺少page_number或公告章节")
+            item_type = str(item.get('type', '')).strip().lower()
+            if item_type in prohibited_addbacks and item.get('add_back_allowed') is True:
+                self.errors.append(f"[PROFIT_QUALITY] {item_type}减值原则上不得加回正常化利润")
+            if item.get('add_back_allowed') is True and not item.get('rationale'):
+                self.errors.append(f"[PROFIT_QUALITY] 第{index}项允许加回但未说明证据")
+
+        if not quality.get('conclusion'):
+            self.errors.append("[PROFIT_QUALITY] 触发后必须填写三层利润质量结论")
+
+        policy = self.data.get('analysis_metadata', {}).get('valuation_policy', {})
+        if policy.get('pe_applicable', False) and policy.get('ttm_method') != 'NOT_AVAILABLE':
+            normalized_ttm_profit = quality.get('normalized_ttm_profit', {}).get('value')
+            normalized_ttm_pe = quality.get('normalized_ttm_pe', {}).get('value')
+            if normalized_ttm_profit is None:
+                self.errors.append("[PROFIT_QUALITY] PE适用且TTM可得时必须填写normalized_ttm_profit.value")
+            if normalized_ttm_pe is None:
+                self.errors.append("[PROFIT_QUALITY] PE适用且TTM可得时必须填写normalized_ttm_pe.value")
+            market_cap = self._numeric_value(core.get('market_cap'))
+            if market_cap > 0 and normalized_ttm_profit and normalized_ttm_pe is not None:
+                expected_pe = market_cap / normalized_ttm_profit
+                if not self._approximately_equal(
+                    expected_pe, normalized_ttm_pe,
+                    relative_tolerance=0.01, absolute_tolerance=0.01
+                ):
+                    self.errors.append(
+                        f"[PROFIT_QUALITY] 正常化TTM PE错误: {market_cap} / "
+                        f"{normalized_ttm_profit} = {expected_pe:.4f}，但填写为{normalized_ttm_pe}"
+                    )
+
+        if not any(e for e in self.errors if e.startswith('[PROFIT_QUALITY]')):
+            print(f"   [PASS] 已完成减值桥接，减值/归母利润={total_impairment / attributable_profit:.1%}")
+
+    def _validate_credit_chain(self):
+        """有信用链敞口时强制检查法律责任、隐性支持和压力损失。"""
+        print("\n[4.3] 信用链压力测试校验")
+        chain = self.data.get('credit_chain') or {}
+        exposure_fields = (
+            'legal_off_balance_obligations', 'related_party_loans', 'factoring_and_microloans',
+            'finance_company_deposits', 'associate_or_subsidiary_debt'
+        )
+        nonzero_fields = [name for name in exposure_fields if abs(self._numeric_value(chain.get(name))) > 0]
+        implicit_support = bool((chain.get('implicit_support') or {}).get('exists', False))
+        triggered = bool(chain.get('triggered', False) or nonzero_fields or implicit_support)
+        if not triggered:
+            print("   [PASS] 未识别到信用链压力测试触发项")
+            return
+
+        if not chain.get('triggered', False):
+            self.errors.append("[CREDIT_CHAIN] 已存在关联/表外敞口，triggered必须为true")
+        for name in nonzero_fields:
+            item = chain.get(name) or {}
+            if not item.get('source'):
+                self.errors.append(f"[CREDIT_CHAIN] {name}有余额但缺少source")
+            if not item.get('page_number'):
+                self.warnings.append(f"[CREDIT_CHAIN] {name}有余额但缺少page_number或公告章节")
+        if self._numeric_value(chain.get('related_party_loans')) and not (chain.get('related_party_loans') or {}).get('direction'):
+            self.errors.append("[CREDIT_CHAIN] 关联贷款必须标明资金方向direction")
+        if self._numeric_value(chain.get('finance_company_deposits')) and not (chain.get('finance_company_deposits') or {}).get('direction'):
+            self.errors.append("[CREDIT_CHAIN] 财务公司存款必须标明资金方向direction")
+        if implicit_support and not (chain.get('implicit_support') or {}).get('rationale'):
+            self.errors.append("[CREDIT_CHAIN] 存在隐性支持时必须说明rationale")
+        for field in ('funding_cost_assessment', 'solvency_and_cutoff_assessment', 'conclusion'):
+            if not chain.get(field):
+                self.errors.append(f"[CREDIT_CHAIN] 触发后必须填写{field}")
+        if not chain.get('stress_test_completed', False):
+            self.errors.append("[CREDIT_CHAIN] 触发后必须完成基准/下行情景压力测试")
+        scenarios = chain.get('stress_scenarios') or []
+        scenario_names = {str(s.get('scenario', '')).lower() for s in scenarios if isinstance(s, dict)}
+        if not {'base', 'downside'}.issubset(scenario_names):
+            self.errors.append("[CREDIT_CHAIN] stress_scenarios必须同时包含base和downside")
+        for index, scenario in enumerate(scenarios, 1):
+            if scenario.get('expected_support_loss') is None or not scenario.get('impact_on_net_cash_fcf_dividend'):
+                self.errors.append(f"[CREDIT_CHAIN] 第{index}个压力情景缺少预计损失或净现金/FCF/分红影响")
+
+        if not any(e for e in self.errors if e.startswith('[CREDIT_CHAIN]')):
+            print("   [PASS] 信用链敞口与压力情景已填写")
     
     def _validate_cashflow_data(self):
         """校验现金流数据（S级强制）"""

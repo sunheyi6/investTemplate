@@ -1,9 +1,9 @@
 template:
   id: "V5.5.24"
-  name: "股东回报、FCF收益率与现金可用性版"
-  updated: "2026-08-20"
-  revision: "2026-08-25-r4"
-  data_schema_version: "V5.5.24.2"
+  name: "股东回报、正常化利润与信用链版"
+  updated: "2026-08-26"
+  revision: "2026-08-26-r5"
+  data_schema_version: "V5.5.24.3"
   entrypoint: "analysis-template.md"
   chapter_dir: "template/"
   changelog: "docs/CHANGELOG.md"
@@ -18,6 +18,8 @@ policy:
   historical_price_anchor_source: "template/06-估值与安全边际.md"
   watchlist_card_source: "template/07-决策流程与持仓管理.md"
   top_tier_rule_source: "template/07-决策流程与持仓管理.md#70a-顶格标的判定与配置v5524-r3新增"
+  normalized_profit_source: "template/06-估值与安全边际.md#64-业绩还原与投资视角分离框架v5524-r5修订"
+  credit_chain_source: "template/03-深度负债与周期分析.md#32a-信用链穿透与压力测试v5524-r5新增"
   top_tier_flow_guide: "analysis-template.md#05-顶格标的判定v5524-r3新增"
   a_share_diff_valuation_source: "template/06-估值与安全边际.md#60a-a股港股差异化估值标准v5511新增v5524-r3确认当前有效"
 
@@ -37,3 +39,5 @@ rules:
   historical_price_anchor_forbidden: true
   watchlist_card_projection_only: true
   top_tier_position_rule_enabled: true
+  normalized_profit_bridge_required_on_trigger: true
+  credit_chain_stress_required_on_trigger: true
