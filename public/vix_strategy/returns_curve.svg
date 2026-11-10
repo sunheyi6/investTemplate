@@ -15,10 +15,10 @@
 <line x1='70' y1='100.0' x2='860' y2='100.0' stroke='#e5e7eb' stroke-width='1' stroke-dasharray='2,2'/>
 <line x1='70' y1='40.0' x2='860' y2='40.0' stroke='#e5e7eb' stroke-width='1' stroke-dasharray='2,2'/>
 <line x1='70' y1='339.8' x2='860' y2='339.8' stroke='#9ca3af' stroke-width='1.5'/>
-  <path d='M70.0,340.0 L122.7,229.2 L175.3,165.8 L228.0,93.5 L280.7,67.3 L333.3,96.2 L386.0,128.1 L438.7,163.2 L491.3,211.1 L544.0,188.2 L596.7,153.1 L649.3,181.6 L702.0,227.7 L754.7,151.0 L807.3,118.3 L860.0,236.2 L860.0,339.8 L70.0,339.8 Z' fill='url(#areaGradient)' stroke='none'/>
-  <path d='M70.0,340.0 L122.7,229.2 L175.3,165.8 L228.0,93.5 L280.7,67.3 L333.3,96.2 L386.0,128.1 L438.7,163.2 L491.3,211.1 L544.0,188.2 L596.7,153.1 L649.3,181.6 L702.0,227.7 L754.7,151.0 L807.3,118.3 L860.0,236.2' fill='none' stroke='#16a34a' stroke-width='2.5' stroke-linejoin='round' stroke-linecap='round'/>
-  <circle cx='860.0' cy='236.2' r='5' fill='#16a34a' stroke='#ffffff' stroke-width='2'/>
-  <text x='860.0' y='224.2' text-anchor='middle' font-size='11' font-weight='bold' fill='#16a34a'>+5.84%</text>
+  <path d='M70.0,340.0 L119.4,229.2 L168.8,165.8 L218.1,93.5 L267.5,67.3 L316.9,96.2 L366.2,128.1 L415.6,163.2 L465.0,211.1 L514.4,188.2 L563.8,153.1 L613.1,181.6 L662.5,227.7 L711.9,151.0 L761.2,118.3 L810.6,236.2 L860.0,274.2 L860.0,339.8 L70.0,339.8 Z' fill='url(#areaGradient)' stroke='none'/>
+  <path d='M70.0,340.0 L119.4,229.2 L168.8,165.8 L218.1,93.5 L267.5,67.3 L316.9,96.2 L366.2,128.1 L415.6,163.2 L465.0,211.1 L514.4,188.2 L563.8,153.1 L613.1,181.6 L662.5,227.7 L711.9,151.0 L761.2,118.3 L810.6,236.2 L860.0,274.2' fill='none' stroke='#16a34a' stroke-width='2.5' stroke-linejoin='round' stroke-linecap='round'/>
+  <circle cx='860.0' cy='274.2' r='5' fill='#16a34a' stroke='#ffffff' stroke-width='2'/>
+  <text x='860.0' y='262.2' text-anchor='middle' font-size='11' font-weight='bold' fill='#16a34a'>+3.70%</text>
   <!-- Axis labels -->
 <text x='60' y='344.0' text-anchor='end' font-size='11' fill='#6b7280'>-0.0%</text>
 <text x='60' y='284.0' text-anchor='end' font-size='11' fill='#6b7280'>3.4%</text>
@@ -27,11 +27,12 @@
 <text x='60' y='104.0' text-anchor='end' font-size='11' fill='#6b7280'>13.5%</text>
 <text x='60' y='44.0' text-anchor='end' font-size='11' fill='#6b7280'>16.9%</text>
 <text x='70.0' y='360' text-anchor='middle' font-size='10' fill='#6b7280' transform='rotate(-30 70.0,360)'>2026-03-31</text>
-<text x='175.3' y='360' text-anchor='middle' font-size='10' fill='#6b7280' transform='rotate(-30 175.3,360)'>2026-04-28</text>
-<text x='280.7' y='360' text-anchor='middle' font-size='10' fill='#6b7280' transform='rotate(-30 280.7,360)'>2026-05-26</text>
-<text x='386.0' y='360' text-anchor='middle' font-size='10' fill='#6b7280' transform='rotate(-30 386.0,360)'>2026-06-23</text>
-<text x='491.3' y='360' text-anchor='middle' font-size='10' fill='#6b7280' transform='rotate(-30 491.3,360)'>2026-07-21</text>
-<text x='596.7' y='360' text-anchor='middle' font-size='10' fill='#6b7280' transform='rotate(-30 596.7,360)'>2026-08-18</text>
-<text x='702.0' y='360' text-anchor='middle' font-size='10' fill='#6b7280' transform='rotate(-30 702.0,360)'>2026-09-15</text>
-<text x='807.3' y='360' text-anchor='middle' font-size='10' fill='#6b7280' transform='rotate(-30 807.3,360)'>2026-10-13</text>
+<text x='168.8' y='360' text-anchor='middle' font-size='10' fill='#6b7280' transform='rotate(-30 168.8,360)'>2026-04-28</text>
+<text x='267.5' y='360' text-anchor='middle' font-size='10' fill='#6b7280' transform='rotate(-30 267.5,360)'>2026-05-26</text>
+<text x='366.2' y='360' text-anchor='middle' font-size='10' fill='#6b7280' transform='rotate(-30 366.2,360)'>2026-06-23</text>
+<text x='465.0' y='360' text-anchor='middle' font-size='10' fill='#6b7280' transform='rotate(-30 465.0,360)'>2026-07-21</text>
+<text x='563.8' y='360' text-anchor='middle' font-size='10' fill='#6b7280' transform='rotate(-30 563.8,360)'>2026-08-18</text>
+<text x='662.5' y='360' text-anchor='middle' font-size='10' fill='#6b7280' transform='rotate(-30 662.5,360)'>2026-09-15</text>
+<text x='761.2' y='360' text-anchor='middle' font-size='10' fill='#6b7280' transform='rotate(-30 761.2,360)'>2026-10-13</text>
+<text x='860.0' y='360' text-anchor='middle' font-size='10' fill='#6b7280' transform='rotate(-30 860.0,360)'>2026-11-10</text>
   <text x='70' y='390' font-size='10' fill='#9ca3af'>数据来源: VIX定投策略 | 仅定投日</text></svg>
