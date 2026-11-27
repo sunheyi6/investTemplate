@@ -2,16 +2,16 @@
   "meta": {
     "template_version": "V5.5.12",
     "engine_version": "V3.1",
-    "generated_at": "2026-11-17 18:41:27",
-    "latest_trade_date": "2026-11-17"
+    "generated_at": "2026-11-27 18:27:43",
+    "latest_trade_date": "2026-11-27"
   },
   "portfolio": {
     "initial_capital": 500000.0,
-    "cash": 45834.0,
-    "market_value": 350187.0,
-    "net_value": 396021.0,
-    "total_return_pct": -20.7958,
-    "position_ratio_pct": 70.0374,
+    "cash": 44019.0,
+    "market_value": 347421.0,
+    "net_value": 391440.0,
+    "total_return_pct": -21.712,
+    "position_ratio_pct": 69.4842,
     "positions": [
       {
         "name": "中国食品",
@@ -24,21 +24,21 @@
         "market_value": 40300.0,
         "unrealized": 0.0,
         "sell_trigger": 5.31,
-        "weight_pct": 10.1762,
+        "weight_pct": 10.2953,
         "status": "占位"
       },
       {
         "name": "天津发展",
         "code": "00882",
         "ticker": "0882.HK",
-        "shares": 40000,
-        "avg_cost": 2.55,
-        "close": 1.92,
-        "change_pct": -1.03,
-        "market_value": 76800.0,
-        "unrealized": -25200.0,
+        "shares": 41000,
+        "avg_cost": 2.532073,
+        "close": 1.815,
+        "change_pct": 0.0,
+        "market_value": 74415.0,
+        "unrealized": -29399.99,
         "sell_trigger": 4.5,
-        "weight_pct": 19.3929,
+        "weight_pct": 19.0106,
         "status": "实时"
       },
       {
@@ -47,12 +47,12 @@
         "ticker": "1522.HK",
         "shares": 414000,
         "avg_cost": 0.277791,
-        "close": 0.183,
-        "change_pct": 0.0,
-        "market_value": 75762.0,
-        "unrealized": -39243.47,
+        "close": 0.189,
+        "change_pct": 2.16,
+        "market_value": 78246.0,
+        "unrealized": -36759.47,
         "sell_trigger": 0.6,
-        "weight_pct": 19.1308,
+        "weight_pct": 19.9893,
         "status": "实时"
       },
       {
@@ -61,12 +61,12 @@
         "ticker": "3320.HK",
         "shares": 17000,
         "avg_cost": 5.227059,
-        "close": 4.475,
-        "change_pct": -0.33,
-        "market_value": 76075.0,
-        "unrealized": -12785.0,
+        "close": 4.38,
+        "change_pct": 1.62,
+        "market_value": 74460.0,
+        "unrealized": -14400.0,
         "sell_trigger": 9.0,
-        "weight_pct": 19.2098,
+        "weight_pct": 19.0221,
         "status": "实时"
       },
       {
@@ -75,12 +75,12 @@
         "ticker": "87001.HK",
         "shares": 250000,
         "avg_cost": 0.432,
-        "close": 0.325,
-        "change_pct": -1.52,
-        "market_value": 81250.0,
-        "unrealized": -26750.0,
+        "close": 0.32,
+        "change_pct": 0.0,
+        "market_value": 80000.0,
+        "unrealized": -28000.0,
         "sell_trigger": 1.0,
-        "weight_pct": 20.5166,
+        "weight_pct": 20.4374,
         "status": "实时"
       }
     ]
@@ -256,9 +256,30 @@
       "shares": 5000,
       "amount": 905.0,
       "reason": "加仓：当前价 0.181 低于成本价 0.279 的95%（0.265），触发回撤加仓策略"
+    },
+    {
+      "date": "2026-11-27",
+      "ticker": "0882.HK",
+      "name": "天津发展",
+      "action": "BUY_ADD",
+      "price": 1.815,
+      "shares": 1000,
+      "amount": 1815.0,
+      "reason": "加仓：当前价 1.815 低于成本价 2.550 的95%（2.422），触发回撤加仓策略"
     }
   ],
   "grouped_trades": {
+    "2026-11-27": [
+      {
+        "ticker": "0882.HK",
+        "name": "天津发展",
+        "action": "BUY_ADD",
+        "price": 1.815,
+        "shares": 1000,
+        "amount": 1815.0,
+        "reason": "加仓：当前价 1.815 低于成本价 2.550 的95%（2.422），触发回撤加仓策略"
+      }
+    ],
     "2026-10-29": [
       {
         "ticker": "1522.HK",

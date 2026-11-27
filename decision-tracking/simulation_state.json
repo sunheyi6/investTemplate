@@ -2,8 +2,8 @@
   "template_version": "V5.5.22",
   "engine_version": "V3.1",
   "initial_capital": 500000.0,
-  "cash": 45834.0,
-  "last_trade_date": "2026-11-17",
+  "cash": 44019.0,
+  "last_trade_date": "2026-11-27",
   "positions": {
     "1522.HK": {
       "name": "京投交通科技",
@@ -32,8 +32,8 @@
       "name": "天津发展",
       "code": "00882",
       "ticker": "0882.HK",
-      "shares": 40000,
-      "avg_cost": 2.55,
+      "shares": 41000,
+      "avg_cost": 2.532073,
       "sell_trigger": 4.5,
       "lot_size": 1000,
       "position_type": "核心",
